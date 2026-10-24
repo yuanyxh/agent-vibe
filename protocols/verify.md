@@ -2,6 +2,10 @@
 
 生成后检查实例化结果是否可用。
 
+## 种子仓库自检
+
+改动 `seeds/`、`protocols/` 或 `adapters/` 后执行 `scripts/verify-seeds.sh`。失败项先修复；`--strict` 将警告视为失败。
+
 ## 通用检查
 
 | 项 | 判据 |

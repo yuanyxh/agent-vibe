@@ -66,4 +66,4 @@
 
 ## 维护种子
 
-新增能力只需新增种子，不改目录结构。规则见 `protocols/`。
+新增能力只需新增种子，不改目录结构。规则见 `protocols/`。改动后执行 `scripts/verify-seeds.sh`；首次 clone 后执行 `git config core.hooksPath .githooks`，提交前自动校验。
