@@ -28,6 +28,7 @@ status: active
 | 自动更新 | `auto-update.md` | 桌面或客户端分发 | 设计升级通道 |
 | 配置化 | `configuration.md` | 环境差异、特性开关 | 配置分散或频繁改代码 |
 | 测试策略 | `testing.md` | 分层测试、质量门 | 设计测试或缺陷回归 |
+| 代码设计与模式 | `design-patterns.md` | 模块复用、抽象时机、模式选择 | 复制代码增多或抽象失控 |
 | 组件与主题 | `component-design.md` | 界面复用、设计系统 | 组件膨胀或风格不一致 |
 | 部署自动化 | `deployment.md` | 构建、发布、回滚 | 进入持续交付 |
 | 异常与轨迹 | `observability.md` | 崩溃、错误上报、用户轨迹 | 线上问题难以定位 |
