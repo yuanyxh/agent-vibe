@@ -33,6 +33,7 @@ status: active
 | 部署自动化 | `deployment.md` | 构建、发布、回滚 | 进入持续交付 |
 | 异常与轨迹 | `observability.md` | 崩溃、错误上报、用户轨迹 | 线上问题难以定位 |
 | 系统定义与标准化 | `system-definition.md` | 项目启动、术语、边界 | 新项目或多人协作 |
+| 缺陷类型与调试手段 | `debugging-playbook.md` | 卡顿、内存、卡死、慢查询、UI 显示与交互 | 选择调试工具或定位根因 |
 
 ## 加载规则
 
