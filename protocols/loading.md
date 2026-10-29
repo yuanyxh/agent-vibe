@@ -48,7 +48,7 @@ skills: [build, review]         # load_via=skill 时必填
 | --- | --- | --- | --- | --- |
 | Claude Code | `CLAUDE.md` 内联 | `.claude/rules/*.md` + `paths` | `.agent/rules/*.md`，由技能读取 | 索引 + 按需读取 |
 | Cursor | `.cursor/rules/core.mdc`，`alwaysApply: true` | `.mdc` + `globs` | `.cursor/commands/<skill>.md` 引用规则 | 索引 + 按需读取 |
-| Codex | `AGENTS.md` 内联 | 子目录 `AGENTS.md`；不支持时降级 | `.agent/skills/*/SKILL.md` | 索引 + 按需读取 |
+| Codex | `AGENTS.md` 内联 | 子目录 `AGENTS.md`；不支持时降级 | `.agents/skills/*/SKILL.md`，`$<name>` 调用；目录不可用时退回 `.agent/skills/` 并标记降级 | 索引 + 按需读取 |
 | 通用 | `AGENTS.md` 内联 | 无原生机制时降级 | 索引 + 读取 | 索引 + 读取 |
 
 平台没有原生机制时，不得声称“按需加载”，必须在契约中标记降级方式。
@@ -72,7 +72,7 @@ skills: [build, review]         # load_via=skill 时必填
 ## 生成要求
 
 1. 先生成加载清单：每项内容属于哪一层、触发条件、目标机制。
-2. 只把 L0 写入常驻文件；L2 规则由技能正文指向，不复制。
+2. 只把 L0 写入常驻文件；核心内联块用 `<!-- core:start -->` 与 `<!-- core:end -->` 包裹，块内 ≤ 60 行；L2 规则由技能正文指向，不复制。
 3. L1 必须有可执行的匹配范围；范围为空视为 L0 或 L3，不得留在 L1。
 4. L2 的 `skills` 必须全部存在；缺一个则不生成该规则并登记原因。
 5. 契约中的索引只写路径、触发与机制，不写规则正文。

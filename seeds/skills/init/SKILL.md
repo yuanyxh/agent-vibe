@@ -29,7 +29,7 @@ verify: 画像完备、项目可构建、启动契约存在
 ## 完成条件
 
 - 目标项目路径独立于种子仓库。
-- `.agent/profile.yaml` 所有必填字段有值；领域、环境、记忆文件存在且非空。
+- `.agent/profile.yaml` 所有必填字段有值，且 `seed_version` 等于当前 `SEEDS_VERSION`；领域、环境、记忆文件存在且非空。
 - `.agent/environment.md` 含可脚本化驱动方式：启动命令、打开目标界面的入口、截图或断言手段、日志路径。缺失即为基座不完备。
 - 规则与技能已按适配器位置实例化，文件非空。
 - 启动契约存在，含常驻约束、加载策略、技能索引与工作循环。
@@ -106,13 +106,13 @@ verify: 画像完备、项目可构建、启动契约存在
 先把第 3 步的研究结论写入 `.agent/research.md`，再执行以下步骤。
 
 1. 在目标路径创建目录；目标路径不得是种子仓库。
-2. `.agent/profile.yaml`、`status.md`、`decisions.md`、`lessons.md`、`memory/README.md`。
+2. `.agent/profile.yaml`（含 `seed_version`）、`status.md`、`decisions.md`、`lessons.md`、`memory/README.md` 与 `memory/INDEX.md`。
 3. 执行 `protocols/environment.md` 的环境探测，写入 `.agent/environment.md`；其中必须写明可脚本化驱动方式（启动命令、界面入口、截图或断言手段、日志路径），不可脚本化时说明替代验证方式。
 4. 项目骨架：优先使用 `packs/` 中匹配的技术包；没有匹配包时按 `seeds/scaffolds/README.md` 的结构要求现场生成，并在报告中标注“未使用技术包”。
 5. 版本控制：按画像初始化仓库，生成忽略规则，覆盖构建产物、依赖、本地配置与验证数据；首次提交需用户授权。
-6. 工程化配置：生成格式化、静态检查、类型检查与本地钩子配置，命令与 `verify.*` 一致。
+6. 工程化配置：生成格式化、静态检查、类型检查与本地钩子配置，命令与 `verify.*` 一致。从 `seeds/scaffolds/hooks/` 生成 `pre-commit` 与 `commit-msg`，替换占位符并设为可执行，用 `core.hooksPath` 安装；`repo_host=github` 时生成 `.github/PULL_REQUEST_TEMPLATE.md`。钩子至少覆盖 `verify.format` 与 `verify.lint`。
 7. 能力生长：逐项检查 `seeds/capabilities/`，按 `triggers` 与画像决定生成、跳过或待生长；研究类能力已在第 3 步完成，登记为已生成，不重复执行。上下文未确定的维度不生成，登记原因。知识包按 `seeds/knowledge/INDEX.md` 选取相关主题，写入项目索引。
-8. 领域生长：为每个 `project.domain` 解析定义——`seeds/domains/` 有匹配则复用，否则按 `seeds/domains/_schema.md` 现场生成并写入项目 `.agent/domains/`；逐条覆盖 `core_concerns`，未覆盖项登记原因。
+8. 领域生长：为每个 `project.domain` 解析定义——`seeds/domains/` 有匹配则复用，否则按 `seeds/domains/_schema.md` 现场生成并写入项目 `.agent/domains/`；逐条覆盖 `core_concerns`，未覆盖项登记原因。复用定义时保留正文，剥离种子元数据。
 9. 规则：按 `applies_when` 筛选，排除非 active 与过期条目；按 `protocols/loading.md` 分层：`always` 合并内联进契约（≤ 60 行），`path` 生成带路径范围的规则文件，`skill` 写入 `.agent/rules/` 且由技能正文引用，`read` 在契约标记降级。剥离种子元数据，只保留正文。
 10. 技能：逐文件写入目标位置，每个 `SKILL.md` 必须有正文，并写明执行前要读取的规则；禁止只建目录。
 11. 启动契约：写入常驻约束、加载策略、技能索引、工作循环与验证命令；只写索引与摘要，不复制规则全文。

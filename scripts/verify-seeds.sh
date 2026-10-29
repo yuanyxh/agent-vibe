@@ -27,6 +27,19 @@ SCAN_ROOTS = ("AGENTS.md", "README.md", "CAPABILITIES.md")
 SCAN_DIRS = ("seeds", "protocols", "adapters", "examples")
 SKIP_NAMES = {"README.md", "INDEX.md", "_schema.md"}
 PATH_SCOPES = {"source", "ui", "server", "tests", "config", "domain"}
+PLATFORM_ADAPTERS = {
+    "Claude Code": "claude-code.md",
+    "Cursor": "cursor.md",
+    "Codex": "codex.md",
+    "通用": "generic.md",
+}
+DENY_TECH = re.compile(
+    r"\b(React|Vue|Angular|Svelte|Next\.js|Nuxt|Spring|Django|Flask|FastAPI|Rails|"
+    r"Laravel|Flutter|SwiftUI|Electron|Tauri|Express|NestJS|Ktor|Gin|Actix)\b",
+    re.I,
+)
+PERSONAL_PATH = re.compile(r"/Users/|/home/|~/Documents|[A-Za-z]:\\\\")
+PLATFORM_PATH = re.compile(r"\.claude/|\.cursor/|CLAUDE\.md|\.agents/")
 
 fails, warns = [], []
 
@@ -57,7 +70,11 @@ def parse(path):
 def scan_files():
     found = sorted(glob.glob("seeds/**/*.md", recursive=True))
     found += sorted(glob.glob("examples/domains/*.md"))
-    return found
+    return [
+        path
+        for path in found
+        if not path.startswith(("seeds/scaffolds/hooks/", "seeds/scaffolds/github/"))
+    ]
 
 
 def check_rule(path, keys, text):
@@ -96,6 +113,35 @@ def check_rule(path, keys, text):
                 fail(path, f"引用不存在的技能: {name}")
 
 
+def list_items(text, field):
+    for line in text.splitlines():
+        match = re.match(rf"^{field}:\s*\[(.*)\]\s*$", line)
+        if match:
+            return [item.strip() for item in match.group(1).split(",") if item.strip()]
+    items = []
+    in_block = False
+    for line in text.splitlines():
+        if not in_block:
+            in_block = re.match(rf"^{field}:\s*$", line) is not None
+            continue
+        if re.match(r"^[a-z_]+:", line):
+            break
+        match = re.match(r"^\s*-\s+(.+)$", line)
+        if match:
+            items.append(match.group(1).strip())
+    return items
+
+
+def check_domain(path, text):
+    front = text.split("---", 2)[1]
+    concerns = list_items(front, "core_concerns")
+    if not 3 <= len(concerns) <= 8:
+        fail(path, f"core_concerns 应为 3~8 条，当前 {len(concerns)}")
+    for field in ("questions", "research", "verify", "pitfalls"):
+        if not list_items(front, field):
+            fail(path, f"{field} 不能为空")
+
+
 def check_kind(path, keys, text):
     kind = keys.get("kind", "")
     if kind in ("schema", "index"):
@@ -110,6 +156,8 @@ def check_kind(path, keys, text):
         check_rule(path, keys, text)
     if kind == "skill" and not keys.get("description"):
         fail(path, "技能缺少 description")
+    if kind == "domain":
+        check_domain(path, text)
     return True
 
 
@@ -137,7 +185,7 @@ for path in files:
     if keys.get("kind") == "rule":
         for rid in re.findall(r"^##\s+([A-Z][A-Z0-9]+-\d+)\b", text, re.M):
             if rid in rule_ids:
-                warn(path, f"规则编号重复: {rid} 也在 {rule_ids[rid]}")
+                fail(path, f"规则编号重复: {rid} 也在 {rule_ids[rid]}")
             rule_ids[rid] = path
 
 idx_path = "seeds/knowledge/INDEX.md"
@@ -169,6 +217,59 @@ for path in scan:
         local = target.split("#", 1)[0]
         if local and not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(path), local))):
             fail(path, f"链接不存在: {target}")
+
+for path in files:
+    keys, _ = parse(path)
+    if not keys or keys.get("kind") != "rule" or keys.get("load_via") != "skill":
+        continue
+    names = re.findall(r"[a-z][a-z0-9-]*", keys.get("skills", ""))
+    base = os.path.basename(path)
+    referenced = False
+    for name in names:
+        skill_path = f"seeds/skills/{name}/SKILL.md"
+        if os.path.exists(skill_path) and base in open(skill_path, encoding="utf-8").read():
+            referenced = True
+            break
+    if not referenced:
+        fail(path, f"load_via=skill 但声明的技能未引用 {base}")
+
+loading = open("protocols/loading.md", encoding="utf-8").read()
+for label, adapter in PLATFORM_ADAPTERS.items():
+    if not re.search(rf"^\|\s*{re.escape(label)}\s*\|", loading, re.M):
+        fail("protocols/loading.md", f"平台矩阵缺少 {label}")
+    if not os.path.exists(f"adapters/{adapter}"):
+        fail(f"adapters/{adapter}", f"平台矩阵引用 {label} 但适配器不存在")
+for path in glob.glob("adapters/*.md"):
+    if os.path.basename(path) not in PLATFORM_ADAPTERS.values():
+        fail(path, "适配器未出现在平台矩阵")
+
+docs = "".join(open(p, encoding="utf-8").read() for p in ("README.md", "CAPABILITIES.md"))
+for path in glob.glob("seeds/skills/*/SKILL.md"):
+    skill = os.path.basename(os.path.dirname(path))
+    if skill not in docs:
+        fail(path, f"技能 {skill} 未在 README 或 CAPABILITIES 登记")
+
+if not os.path.exists("SEEDS_VERSION"):
+    fail("SEEDS_VERSION", "缺失")
+else:
+    version = open("SEEDS_VERSION", encoding="utf-8").read().strip()
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        fail("SEEDS_VERSION", f"版本号非法: {version}")
+    if not os.path.exists("CHANGELOG.md"):
+        fail("CHANGELOG.md", "缺失")
+    elif f"## {version}" not in open("CHANGELOG.md", encoding="utf-8").read():
+        fail("CHANGELOG.md", f"缺少版本 {version} 的记录")
+
+for path in glob.glob("seeds/**/*.md", recursive=True):
+    text = open(path, encoding="utf-8").read()
+    hit = DENY_TECH.search(text)
+    if hit:
+        fail(path, f"种子出现具体技术栈: {hit.group(0)}")
+    if PERSONAL_PATH.search(text):
+        fail(path, "种子出现个人路径")
+    hit = PLATFORM_PATH.search(text)
+    if hit:
+        fail(path, f"种子出现平台路径: {hit.group(0)}")
 
 print(f"检查种子 {checked} 个 | 错误 {len(fails)} | 警告 {len(warns)}")
 for line in fails:

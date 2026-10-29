@@ -1,6 +1,6 @@
 ---
 id: adapter/generic
-applies_when: { agent.platform: "generic|codex" }
+applies_when: { agent.platform: generic }
 ---
 
 # 通用 Agent 适配
@@ -57,7 +57,7 @@ applies_when: { agent.platform: "generic|codex" }
 5. 断点规则。
 6. 自学习文件位置。
 
-若 Agent 支持按目录自动发现技能，`.agent/skills/` 可直接生效；否则在契约中列出每个技能的路径，要求按需读取。
+若 Agent 支持按目录自动发现技能，`.agent/skills/` 可直接生效；否则在契约中列出每个技能的路径，要求按需读取。核心内联块用 `<!-- core:start -->` 与 `<!-- core:end -->` 包裹，块内 ≤ 60 行。
 
 ## 限制
 

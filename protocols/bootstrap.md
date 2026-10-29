@@ -14,9 +14,9 @@ init 只负责把种子实例化为可开发的工程基座，不负责实现业
 
 | 产物 | 判据 |
 | --- | --- |
-| `.agent/profile.yaml` | 必填字段完整 |
+| `.agent/profile.yaml` | 必填字段完整，含 `seed_version` |
 | `.agent/status.md`、`decisions.md`、`lessons.md` | 有初始内容 |
-| `.agent/memory/README.md` | 存在 |
+| `.agent/memory/README.md`、`INDEX.md` | 存在，索引可检索 |
 | `.agent/environment.md` | 有探测记录 |
 | `.agent/research.md` | 有版本基线、实践清单、agent 资产盘点、来源与采纳/拒绝理由 |
 | `.agent/domains/<name>.md` | 每个 domain 一份 |
@@ -25,12 +25,14 @@ init 只负责把种子实例化为可开发的工程基座，不负责实现业
 | 技能文件 | 至少一个有效技能，头部只有平台字段，正文写明要读取的规则 |
 | 启动契约 | 含常驻约束、加载策略、技能索引、工作循环、验证命令 |
 | 工程化配置 | 格式化、静态检查、类型检查、忽略规则 |
+| 本地钩子 | `pre-commit` 与 `commit-msg` 可执行，`core.hooksPath` 已设置，命令与 `verify.format` / `verify.lint` 一致 |
+| PR 模板 | `repo_host=github` 时存在 `.github/PULL_REQUEST_TEMPLATE.md` |
 | 项目骨架 | 可构建的最小结构，不含业务功能 |
 
 ## 顺序
 
 1. 创建目标目录。
-2. 写入状态、画像、记忆骨架。
+2. 写入状态、画像（含 `seed_version`）与记忆索引骨架。
 3. 执行环境探测。
 4. 按 `protocols/research.md` 写入最佳实践与 agent 资产盘点结论。
 5. 生成项目骨架与工程化配置。
@@ -45,6 +47,7 @@ init 只负责把种子实例化为可开发的工程基座，不负责实现业
 ## 校验
 
 - 用目录清单确认每个产物存在且非空。
+- 运行 `scripts/verify-instantiation.sh <目标路径>`，错误项清零。
 - 检查研究：`.agent/research.md` 存在，外部事实有来源、版本与日期，采纳项有映射。
 - 运行工程化命令：格式化检查、静态检查、构建。
 - 检查技能头部只含平台识别字段，规则无种子元数据。

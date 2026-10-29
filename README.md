@@ -12,10 +12,10 @@
 
 - `seeds/`：抽象种子。原则、能力、规则、技能、问题树与结构要求，全部与技术和平台无关。
 - `seeds/capabilities/`：能力定义。说明要保证什么、何时触发、要问什么、要查什么、如何验证；具体产物在上下文确定后生成。记忆能力只定义协议与降级，不内置任何记忆内容。
-- `seeds/domains/`：领域定义规范。领域是开放集合，项目初始化时按上下文生成；`examples/domains/` 提供写法参考。
+- `seeds/domains/`：领域定义规范与高频参考定义。领域是开放集合，命中参考定义则复用，未命中时按上下文生成。
 - `seeds/knowledge/`：通用架构知识包。鉴权、权限、缓存、队列、文件、通知、一致性、时区、导入导出、PDF、更新、配置、测试、组件、部署、可观测性、系统定义；按主题加载，不整册注入。
-- `protocols/`：生长、提炼、校验、演进、加载、研究、环境探测与记忆协议。规则带生命周期与加载方式，按平台能力按需加载。
-- `adapters/`：平台映射。把种子写到 Claude Code、Cursor 或通用 `AGENTS.md` 的约定位置。
+- `protocols/`：生长、提炼、校验、演进、升级、加载、研究、环境探测与记忆协议。规则带生命周期与加载方式，按平台能力按需加载。
+- `adapters/`：平台映射。把种子写到 Claude Code、Cursor、Codex 或通用 `AGENTS.md` 的约定位置。
 - `packs/`：可选技术包。核心仓库留空；需要固定某技术栈的项目结构时再自行添加。
 
 ## 能力手册
@@ -37,14 +37,17 @@
 ```
 <project>/
 ├── <项目正常结构>              # 按画像生成
+├── .githooks/{pre-commit,commit-msg}  # 提交前检查与提交信息校验
+├── .github/PULL_REQUEST_TEMPLATE.md   # GitHub 项目的合并前清单
 ├── CLAUDE.md                   # 启动契约：常驻底线 + 加载索引
 ├── .claude/
 │   ├── skills/                 # 技能正文，按需触发
 │   └── rules/                  # 仅带 paths 的路径规则
 └── .agent/
-    ├── profile.yaml            # 项目画像
+    ├── profile.yaml            # 项目画像，含 seed_version
     ├── research.md             # 最佳实践研究简报
     ├── rules/                  # 任务型规则，由技能读取
+    ├── memory/                 # INDEX.md 索引 + 主题文件
     ├── status.md               # 单一事实源
     ├── decisions.md            # 决策日志
     └── lessons.md              # 自学习沉淀
@@ -60,10 +63,16 @@
 | 缺陷排查 | `hunt` |
 | 变更审查 | `review` |
 | 经验沉淀 | `learn` |
+| 并行子任务 | `delegate` |
 | 依赖与框架升级 | `upgrade` |
 | 发布 | `ship` |
 | 运行期维护 | `operate` |
 
 ## 维护种子
 
-新增能力只需新增种子，不改目录结构。规则见 `protocols/`。改动后执行 `scripts/verify-seeds.sh`；首次 clone 后执行 `git config core.hooksPath .githooks`，提交前自动校验。
+新增能力只需新增种子，不改目录结构。规则见 `protocols/`。
+
+- 种子仓库版本见 `SEEDS_VERSION`，变更记录见 `CHANGELOG.md`；生成项目按 `protocols/upgrade-seeds.md` 升级。
+- 外部规则库只作人工补充来源，不自动同步；导入内容先去掉项目细节再按种子格式重写。
+- 改动后执行 `scripts/check-format.sh`、`scripts/verify-seeds.sh --strict` 与 `scripts/test-fixtures.sh`；CI 在推送与合并请求时执行同一组检查。
+- 首次 clone 后执行 `git config core.hooksPath .githooks`，提交前自动校验。

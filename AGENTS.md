@@ -8,12 +8,14 @@
 - `CAPABILITIES.md`：能力导航；只写有什么、何时用、得到什么，不复制协议细节。
 - `seeds/`：抽象内容。不得出现具体项目名、路径、账号、密钥、技术版本号。
 - `seeds/capabilities/`：能力定义，只写触发、问题、研究项、产物类别与验证标准；不写具体产品配置。记忆能力只写协议、分层与降级，不写入任何记忆内容。
-- `seeds/domains/`：领域定义规范（`_schema.md`）。领域是开放集合，不预置固定清单；`examples/domains/` 仅为写法参考。
+- `seeds/domains/`：领域定义规范（`_schema.md`）与高频参考定义。领域是开放集合；未命中参考定义时现场生成，`examples/domains/` 仅为写法参考。
 - `seeds/knowledge/`：通用架构知识包与索引。只写问题、模式、取舍、验证与反例，不写具体项目实现；按主题加载。
-- `protocols/`：生长、提炼、校验、演进、加载、研究、环境探测与记忆协议。改动协议需同步更新 `adapters/`。
-- `adapters/`：平台落点映射，只描述位置与格式转换，不承载业务内容。
+- `protocols/`：生长、提炼、校验、演进、升级、加载、研究、环境探测与记忆协议。改动协议需同步更新 `adapters/`。
+- `adapters/`：平台落点映射，覆盖 Claude Code、Cursor、Codex 与通用平台，只描述位置与格式转换，不承载业务内容。
+- `SEEDS_VERSION`、`CHANGELOG.md`：种子仓库对外版本与变更记录；生成项目的 `seed_version` 与升级依据。
+- `tests/`：实例化校验的 golden fixture；`.github/`：推送与合并请求的种子校验。
 - `packs/`：可选技术包，由 fork 后自行添加；核心仓库不内置任何技术包。
-- `scripts/`：仓库自检工具；不进入种子产物。
+- `scripts/`：仓库自检工具（格式、种子、实例化）；不进入种子产物。
 - `.githooks/`：提交前检查入口；只调用 `scripts/`，不承载规则内容。
 - `examples/`：完整实例示例，可含具体技术栈，但不被 init 读取。
 
@@ -114,3 +116,5 @@ init 的职责到“工程基座 + 用户确认”为止，不得在 init 内实
 - 种子必须能被至少两个不同技术栈的项目实例化，否则不属于本仓库。
 - 具体技术栈内容放入 `seeds/` 下的独立文件，并由 `applies_when` 限定。
 - 任何源自具体项目的经验，必须先去掉项目细节才能进入 `seeds/`。
+- 外部规则库（如 Agent Rules）只作为人工补充来源，不做自动同步；导入内容须去项目细节后按种子格式重写。
+- 改动种子后必须同时通过 `scripts/verify-seeds.sh --strict` 与 `scripts/test-fixtures.sh`。

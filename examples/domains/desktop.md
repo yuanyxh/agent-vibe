@@ -1,5 +1,5 @@
 ---
-id: domain/desktop
+id: example/domain/desktop
 kind: domain
 summary: 桌面应用与本地工具
 applies_when: { project.domain: desktop }

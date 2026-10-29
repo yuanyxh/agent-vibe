@@ -1,5 +1,5 @@
 ---
-id: domain/backend
+id: example/domain/backend
 kind: domain
 summary: API 服务、后台任务与数据密集型系统
 applies_when: { project.domain: backend }

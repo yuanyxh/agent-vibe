@@ -1,0 +1,18 @@
+seed_version: 1.0.0
+project:
+  name: golden
+  type: web
+  domain: web-app
+agent:
+  platform: claude-code
+delivery:
+  vcs: git
+  repo_host: github
+quality:
+  format: prettier
+  lint: eslint
+verify:
+  build: "true"
+  test: "true"
+  format: npm run format:check
+  lint: npm run lint

@@ -1,5 +1,5 @@
 ---
-id: domain/web-marketing
+id: example/domain/web-marketing
 kind: domain
 summary: 面向公众的内容站、官网与营销页
 applies_when: { project.domain: web-marketing }

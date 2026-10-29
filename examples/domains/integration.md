@@ -1,5 +1,5 @@
 ---
-id: domain/integration
+id: example/domain/integration
 kind: domain
 summary: 三方对接、回调、消息与数据同步
 applies_when: { project.domain: integration }

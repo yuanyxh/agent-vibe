@@ -4,7 +4,9 @@
 
 ## 种子仓库自检
 
-改动 `seeds/`、`protocols/` 或 `adapters/` 后执行 `scripts/verify-seeds.sh`。失败项先修复；`--strict` 将警告视为失败。
+改动 `seeds/`、`protocols/` 或 `adapters/` 后执行 `scripts/check-format.sh`、`scripts/verify-seeds.sh --strict` 与 `scripts/test-fixtures.sh`。失败项先修复；`--strict` 将警告视为失败。
+
+`scripts/verify-instantiation.sh <项目路径>` 校验一次真实生成的基座；`tests/fixtures/` 是回归样例，种子改动不得让样例退化。
 
 ## 通用检查
 
@@ -22,6 +24,8 @@
 | 状态可追溯 | `.agent/status.md` 记录已生成与未生成项 |
 | 项目可构建 | 按画像声明的构建命令执行成功 |
 | 工程化卡口 | 格式化、lint、类型检查命令按画像声明执行成功 |
+| 钩子可执行 | `pre-commit` 与 `commit-msg` 存在且可执行，命令与 `verify.format` / `verify.lint` 一致 |
+| PR 模板 | `repo_host=github` 时存在 PR 模板 |
 | 版本控制就绪 | VCS 已初始化；忽略规则覆盖生成物、依赖、本地配置与验证数据 |
 | 提交合规 | 已提交记录符合提交规范；未提交时说明原因与待授权动作 |
 | 外部事实可追溯 | 版本号、平台支持范围、工具用法有来源与查询时间 |
@@ -43,6 +47,9 @@
 | 启动读取集 | “开始任何任务前”只读契约与 `.agent/status.md`，不遍历 `.agent/` |
 | 无全量机制 | 未用 `@import` 引入按需规则；未把非核心规则设为 `alwaysApply: true` |
 | 无种子元数据残留 | 目标 `SKILL.md` 只有平台识别字段；规则文件无种子元数据，路径规则只保留平台字段 `paths` |
+| 版本可追溯 | `.agent/profile.yaml` 含 `seed_version`，且等于生成时的 `SEEDS_VERSION` |
+| 记忆可追溯 | `.agent/memory/INDEX.md` 存在，条目编号稳定，归档可按编号检索 |
+| 实例化可回归 | golden fixture 通过 `scripts/verify-instantiation.sh`；种子改动不降低校验结果 |
 
 ## 冲突检查
 

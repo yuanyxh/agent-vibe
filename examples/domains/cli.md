@@ -1,5 +1,5 @@
 ---
-id: domain/cli
+id: example/domain/cli
 kind: domain
 summary: 命令行工具与脚本
 applies_when: { project.domain: cli }

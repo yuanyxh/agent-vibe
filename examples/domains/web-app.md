@@ -1,5 +1,5 @@
 ---
-id: domain/web-app
+id: example/domain/web-app
 kind: domain
 summary: 需要登录与业务操作的管理后台、SaaS 与中台
 applies_when: { project.domain: web-app }

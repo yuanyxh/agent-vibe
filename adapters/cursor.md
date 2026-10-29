@@ -30,7 +30,7 @@ alwaysApply: <true 仅用于 core>
 
 按种子头部映射：`load_via=path` → `alwaysApply: false` + `globs`；`load_via=skill` 或 `read` → 不生成 `.mdc`，由 command 或契约索引读取。只有核心使用 `alwaysApply: true`，且合并为单个文件。
 
-`description` 写触发条件，`globs` 写文件范围；两者必须至少有一个，否则视为常驻，禁止用于非核心。种子元数据本身不写入目标文件。`status` 非 active 或 `review_by` 过期的规则不生成。
+`description` 写触发条件，`globs` 写文件范围；两者必须至少有一个，否则视为常驻，禁止用于非核心。种子元数据本身不写入目标文件。`status` 非 active 或 `review_by` 过期的规则不生成。`AGENTS.md` 中的核心内联块用 `<!-- core:start -->` 与 `<!-- core:end -->` 包裹，块内 ≤ 60 行。
 
 ## 技能处理
 

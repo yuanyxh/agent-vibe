@@ -2,4 +2,6 @@
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
-exec "$ROOT/scripts/verify-seeds.sh"
+"$ROOT/scripts/check-format.sh"
+"$ROOT/scripts/verify-seeds.sh" --strict
+exec "$ROOT/scripts/test-fixtures.sh"

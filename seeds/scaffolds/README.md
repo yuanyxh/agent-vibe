@@ -21,6 +21,7 @@
 | 配置 | 环境差异通过配置注入，示例配置不含真实凭据 |
 | 文档 | README 说明安装、运行、测试 |
 | 忽略规则 | 版本控制忽略构建产物、依赖目录与本地配置 |
+| 本地钩子 | 可执行，`core.hooksPath` 已配置，命令与 `verify.format` / `verify.lint` 一致 |
 
 ## 按形态的结构要素
 
@@ -32,6 +33,16 @@
 | library | 公共入口、导出清单、文档、版本策略 | 示例业务逻辑 |
 | mobile | 应用入口、页面组织、平台配置、构建目标 | 与平台无关的服务端代码 |
 | desktop | 主进程与界面入口、打包配置、平台签名占位 | 未声明的原生依赖 |
+
+## 钩子与模板
+
+| 模板 | 落点 | 要求 |
+| --- | --- | --- |
+| `hooks/pre-commit` | `.githooks/pre-commit` | 替换 `{{verify.format}}`、`{{verify.lint}}`、`{{verify.typecheck}}`，未声明替换为 `none`；可执行 |
+| `hooks/commit-msg` | `.githooks/commit-msg` | 按 VCS-02 校验 `类型(范围): 摘要`；可执行 |
+| `github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | `repo_host=github` 时生成 |
+
+安装使用 `git config core.hooksPath .githooks`。钩子与 CI 必须执行同一组命令，失败阻止提交。
 
 ## 最小化原则
 

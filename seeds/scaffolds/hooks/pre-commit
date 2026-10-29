@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+run() {
+  local command="$1"
+  if [ -z "$command" ] || [ "$command" = "none" ]; then
+    return 0
+  fi
+  echo "==> $command"
+  bash -c "$command"
+}
+
+run "{{verify.format}}"
+run "{{verify.lint}}"
+run "{{verify.typecheck}}"

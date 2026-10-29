@@ -1,0 +1,12 @@
+seed_version: 1.0.0
+project:
+  name: broken
+  type: web
+delivery:
+  vcs: git
+quality:
+  format: prettier
+  lint: eslint
+verify:
+  format: npm run format:check
+  lint: npm run lint

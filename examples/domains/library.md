@@ -1,5 +1,5 @@
 ---
-id: domain/library
+id: example/domain/library
 kind: domain
 summary: 供他人依赖的库、SDK 与组件包
 applies_when: { project.domain: library }

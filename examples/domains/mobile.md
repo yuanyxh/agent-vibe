@@ -1,5 +1,5 @@
 ---
-id: domain/mobile
+id: example/domain/mobile
 kind: domain
 summary: 移动应用与跨端应用
 applies_when: { project.domain: mobile }
