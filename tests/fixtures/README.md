@@ -1,6 +1,6 @@
-# 实例化回归样例
+# Instantiation regression fixtures
 
-- `golden/`：一次性 init 产物的最小快照，覆盖契约、状态、规则、技能、记忆索引与可执行钩子。
-- `broken/`：故意违反契约、元数据与钩子规则的负样例，必须被拒绝。
+- `golden/`: a minimal snapshot of one init run, covering the contract, state, rules, skills, memory index, and executable hooks.
+- `broken/`: a negative fixture that deliberately violates contract, metadata, and hook rules; it must be rejected.
 
-运行 `scripts/test-fixtures.sh`。种子改动导致 golden 失败时，先判断是样例过期还是生成规则退化，不得直接改样例绕过。
+Run `scripts/test-fixtures.sh`. If a seed change breaks the golden fixture, decide first whether the fixture is stale or the generation rules regressed. Never edit the fixture just to make it pass.

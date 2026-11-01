@@ -23,15 +23,21 @@ REQUIRED = {
     "principle": "id kind summary applies_when verify",
     "doc": "id kind summary applies_when verify",
 }
-SCAN_ROOTS = ("AGENTS.md", "README.md", "CAPABILITIES.md")
+SCAN_ROOTS = (
+    "AGENTS.md",
+    "README.md",
+    "CAPABILITIES.md",
+    "AGENTS.zh.md",
+    "README.zh.md",
+    "CAPABILITIES.zh.md",
+)
 SCAN_DIRS = ("seeds", "protocols", "adapters", "examples")
 SKIP_NAMES = {"README.md", "INDEX.md", "_schema.md"}
 PATH_SCOPES = {"source", "ui", "server", "tests", "config", "domain"}
-PLATFORM_ADAPTERS = {
-    "Claude Code": "claude-code.md",
-    "Cursor": "cursor.md",
-    "Codex": "codex.md",
-    "通用": "generic.md",
+ADAPTER_FILES = ("claude-code.md", "cursor.md", "codex.md", "generic.md")
+PLATFORM_LABELS = {
+    "en": ("Claude Code", "Cursor", "Codex", "Generic"),
+    "zh": ("Claude Code", "Cursor", "Codex", "通用"),
 }
 DENY_TECH = re.compile(
     r"\b(React|Vue|Angular|Svelte|Next\.js|Nuxt|Spring|Django|Flask|FastAPI|Rails|"
@@ -68,49 +74,45 @@ def parse(path):
 
 
 def scan_files():
-    found = sorted(glob.glob("seeds/**/*.md", recursive=True))
-    found += sorted(glob.glob("examples/domains/*.md"))
-    return [
-        path
-        for path in found
-        if not path.startswith(("seeds/scaffolds/hooks/", "seeds/scaffolds/github/"))
-    ]
+    found = sorted(glob.glob("seeds/en/**/*.md", recursive=True))
+    found += sorted(glob.glob("examples/en/domains/*.md"))
+    return found
 
 
 def check_rule(path, keys, text):
     load = keys.get("load", "")
     if load not in ("always", "on-demand"):
-        fail(path, f"load 非法: {load or '缺失'}")
+        fail(path, f"invalid load: {load or 'missing'}")
     if "version" in keys and not re.fullmatch(r"\d+", keys["version"]):
-        fail(path, "version 必须是整数")
+        fail(path, "version must be an integer")
     for field in ("updated", "review_by"):
         value = keys.get(field, "")
         if value and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
-            fail(path, f"{field} 格式应为 YYYY-MM-DD")
+            fail(path, f"{field} must use YYYY-MM-DD")
     review_by = keys.get("review_by", "")
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", review_by):
         if datetime.date.fromisoformat(review_by) < datetime.date.today():
-            warn(path, f"review_by 已过期: {review_by}")
+            warn(path, f"review_by is past due: {review_by}")
     if keys.get("status") not in ("active", "deprecated", "superseded"):
-        fail(path, f"status 非法: {keys.get('status', '缺失')}")
+        fail(path, f"invalid status: {keys.get('status', 'missing')}")
     if load == "always" and keys.get("status") != "active":
-        warn(path, f"非 active 规则仍为 always: {keys.get('status')}")
+        warn(path, f"non-active rule still uses always: {keys.get('status')}")
     if load != "on-demand":
         return
     if not keys.get("trigger"):
-        fail(path, "on-demand 规则缺少 trigger")
+        fail(path, "on-demand rule is missing trigger")
     via = keys.get("load_via", "")
     if via not in ("path", "skill", "read"):
-        fail(path, f"load_via 非法: {via or '缺失'}")
+        fail(path, f"invalid load_via: {via or 'missing'}")
     if via == "path" and keys.get("path_scope") not in PATH_SCOPES:
-        fail(path, f"path_scope 非法: {keys.get('path_scope', '缺失')}")
+        fail(path, f"invalid path_scope: {keys.get('path_scope', 'missing')}")
     if via == "skill":
         names = re.findall(r"[a-z][a-z0-9-]*", keys.get("skills", ""))
         if not names:
-            fail(path, "load_via=skill 但未声明 skills")
+            fail(path, "load_via=skill but skills is not declared")
         for name in names:
-            if not os.path.exists(f"seeds/skills/{name}/SKILL.md"):
-                fail(path, f"引用不存在的技能: {name}")
+            if not os.path.exists(f"seeds/en/skills/{name}/SKILL.md"):
+                fail(path, f"references a missing skill: {name}")
 
 
 def list_items(text, field):
@@ -136,10 +138,10 @@ def check_domain(path, text):
     front = text.split("---", 2)[1]
     concerns = list_items(front, "core_concerns")
     if not 3 <= len(concerns) <= 8:
-        fail(path, f"core_concerns 应为 3~8 条，当前 {len(concerns)}")
+        fail(path, f"core_concerns must contain 3-8 items, found {len(concerns)}")
     for field in ("questions", "research", "verify", "pitfalls"):
         if not list_items(front, field):
-            fail(path, f"{field} 不能为空")
+            fail(path, f"{field} must not be empty")
 
 
 def check_kind(path, keys, text):
@@ -147,15 +149,15 @@ def check_kind(path, keys, text):
     if kind in ("schema", "index"):
         return False
     if kind not in REQUIRED:
-        fail(path, f"未知 kind: {kind or '缺失'}")
+        fail(path, f"unknown kind: {kind or 'missing'}")
         return True
     for field in REQUIRED[kind].split():
         if field not in keys:
-            fail(path, f"缺少字段 {field}")
+            fail(path, f"missing field {field}")
     if kind == "rule":
         check_rule(path, keys, text)
     if kind == "skill" and not keys.get("description"):
-        fail(path, "技能缺少 description")
+        fail(path, "skill is missing description")
     if kind == "domain":
         check_domain(path, text)
     return True
@@ -170,33 +172,33 @@ for path in files:
     keys, text = parse(path)
     if keys is None:
         if name not in SKIP_NAMES:
-            fail(path, "缺少 front matter")
+            fail(path, "missing front matter")
         continue
     if not check_kind(path, keys, text):
         continue
     checked += 1
     for field in ("id", "summary"):
         if not keys.get(field):
-            fail(path, f"{field} 为空")
+            fail(path, f"{field} is empty")
     if keys.get("id"):
         if keys["id"] in ids:
-            fail(path, f"id 重复: {keys['id']} 也在 {ids[keys['id']]}")
+            fail(path, f"duplicate id: {keys['id']} also in {ids[keys['id']]}")
         ids[keys["id"]] = path
     if keys.get("kind") == "rule":
         for rid in re.findall(r"^##\s+([A-Z][A-Z0-9]+-\d+)\b", text, re.M):
             if rid in rule_ids:
-                fail(path, f"规则编号重复: {rid} 也在 {rule_ids[rid]}")
+                fail(path, f"duplicate rule id: {rid} also in {rule_ids[rid]}")
             rule_ids[rid] = path
 
-idx_path = "seeds/knowledge/INDEX.md"
+idx_path = "seeds/en/knowledge/INDEX.md"
 if os.path.exists(idx_path):
     idx = open(idx_path, encoding="utf-8").read()
     listed = set(re.findall(r"`([A-Za-z0-9_-]+\.md)`", idx))
-    actual = {os.path.basename(p) for p in glob.glob("seeds/knowledge/*.md")} - {"INDEX.md"}
+    actual = {os.path.basename(p) for p in glob.glob("seeds/en/knowledge/*.md")} - {"INDEX.md"}
     for item in sorted(listed - actual):
-        fail(idx_path, f"索引列出但文件不存在: {item}")
+        fail(idx_path, f"index lists a missing file: {item}")
     for item in sorted(actual - listed):
-        fail(idx_path, f"知识包未列入索引: {item}")
+        fail(idx_path, f"knowledge pack is not listed in the index: {item}")
 
 scan = [p for p in SCAN_ROOTS if os.path.exists(p)]
 for base in SCAN_DIRS:
@@ -209,14 +211,14 @@ for path in scan:
         if any(ch in ref for ch in "<>{*}"):
             continue
         if not os.path.exists(ref):
-            fail(path, f"引用不存在: {ref}")
+            fail(path, f"reference does not exist: {ref}")
     for target in link_ref.findall(text):
         target = target.strip().split()[0].strip("<>")
         if not target or target.startswith(("#", "/")) or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", target):
             continue
         local = target.split("#", 1)[0]
         if local and not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(path), local))):
-            fail(path, f"链接不存在: {target}")
+            fail(path, f"link does not exist: {target}")
 
 for path in files:
     keys, _ = parse(path)
@@ -226,52 +228,77 @@ for path in files:
     base = os.path.basename(path)
     referenced = False
     for name in names:
-        skill_path = f"seeds/skills/{name}/SKILL.md"
+        skill_path = f"seeds/en/skills/{name}/SKILL.md"
         if os.path.exists(skill_path) and base in open(skill_path, encoding="utf-8").read():
             referenced = True
             break
     if not referenced:
-        fail(path, f"load_via=skill 但声明的技能未引用 {base}")
+        fail(path, f"load_via=skill but the declared skill does not reference {base}")
 
-loading = open("protocols/loading.md", encoding="utf-8").read()
-for label, adapter in PLATFORM_ADAPTERS.items():
-    if not re.search(rf"^\|\s*{re.escape(label)}\s*\|", loading, re.M):
-        fail("protocols/loading.md", f"平台矩阵缺少 {label}")
-    if not os.path.exists(f"adapters/{adapter}"):
-        fail(f"adapters/{adapter}", f"平台矩阵引用 {label} 但适配器不存在")
-for path in glob.glob("adapters/*.md"):
-    if os.path.basename(path) not in PLATFORM_ADAPTERS.values():
-        fail(path, "适配器未出现在平台矩阵")
+for lang in ("en", "zh"):
+    loading_path = f"protocols/{lang}/loading.md"
+    if not os.path.exists(loading_path):
+        fail(loading_path, "missing loading protocol")
+        continue
+    loading = open(loading_path, encoding="utf-8").read()
+    for label in PLATFORM_LABELS[lang]:
+        if not re.search(rf"^\|\s*{re.escape(label)}\s*\|", loading, re.M):
+            fail(loading_path, f"platform matrix missing {label}")
+    for adapter in ADAPTER_FILES:
+        if not os.path.exists(f"adapters/{lang}/{adapter}"):
+            fail(f"adapters/{lang}/{adapter}", "adapter referenced by the platform matrix is missing")
+    for path in glob.glob(f"adapters/{lang}/*.md"):
+        if os.path.basename(path) not in ADAPTER_FILES:
+            fail(path, "adapter is not listed in the platform matrix")
 
 docs = "".join(open(p, encoding="utf-8").read() for p in ("README.md", "CAPABILITIES.md"))
-for path in glob.glob("seeds/skills/*/SKILL.md"):
+for path in glob.glob("seeds/en/skills/*/SKILL.md"):
     skill = os.path.basename(os.path.dirname(path))
     if skill not in docs:
-        fail(path, f"技能 {skill} 未在 README 或 CAPABILITIES 登记")
+        fail(path, f"skill {skill} is not registered in README or CAPABILITIES")
 
 if not os.path.exists("SEEDS_VERSION"):
-    fail("SEEDS_VERSION", "缺失")
+    fail("SEEDS_VERSION", "missing")
 else:
     version = open("SEEDS_VERSION", encoding="utf-8").read().strip()
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
-        fail("SEEDS_VERSION", f"版本号非法: {version}")
+        fail("SEEDS_VERSION", f"invalid version: {version}")
     if not os.path.exists("CHANGELOG.md"):
-        fail("CHANGELOG.md", "缺失")
+        fail("CHANGELOG.md", "missing")
     elif f"## {version}" not in open("CHANGELOG.md", encoding="utf-8").read():
-        fail("CHANGELOG.md", f"缺少版本 {version} 的记录")
+        fail("CHANGELOG.md", f"missing changelog entry for {version}")
 
-for path in glob.glob("seeds/**/*.md", recursive=True):
+for path in glob.glob("seeds/en/**/*.md", recursive=True):
     text = open(path, encoding="utf-8").read()
     hit = DENY_TECH.search(text)
     if hit:
-        fail(path, f"种子出现具体技术栈: {hit.group(0)}")
+        fail(path, f"seed mentions a concrete stack: {hit.group(0)}")
     if PERSONAL_PATH.search(text):
-        fail(path, "种子出现个人路径")
+        fail(path, "seed contains a personal path")
     hit = PLATFORM_PATH.search(text)
     if hit:
-        fail(path, f"种子出现平台路径: {hit.group(0)}")
+        fail(path, f"seed contains a platform path: {hit.group(0)}")
 
-print(f"检查种子 {checked} 个 | 错误 {len(fails)} | 警告 {len(warns)}")
+for base in ("seeds", "protocols", "adapters", "examples", "packs"):
+    en_files = {
+        os.path.relpath(p, f"{base}/en")
+        for p in glob.glob(f"{base}/en/**/*.md", recursive=True)
+    }
+    zh_files = {
+        os.path.relpath(p, f"{base}/zh")
+        for p in glob.glob(f"{base}/zh/**/*.md", recursive=True)
+    }
+    for rel in sorted(en_files - zh_files):
+        fail(f"{base}/zh/{rel}", "missing Chinese mirror")
+    for rel in sorted(zh_files - en_files):
+        fail(f"{base}/en/{rel}", "missing English source")
+
+for name in ("README", "CAPABILITIES", "AGENTS", "CHANGELOG", "CONTRIBUTING", "SECURITY"):
+    for suffix in (".md", ".zh.md"):
+        if not os.path.exists(f"{name}{suffix}"):
+            fail(f"{name}{suffix}", "missing bilingual document")
+
+print(f"checked {checked} seeds | {len(fails)} errors | {len(warns)} warnings")
 for line in fails:
     print(f"FAIL {line}")
 for line in warns:

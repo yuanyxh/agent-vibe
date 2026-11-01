@@ -46,23 +46,23 @@ for raw in git_files():
     if data.startswith(b"\xef\xbb\xbf"):
         report(rel, None, "UTF-8 BOM")
     if b"\r" in data:
-        report(rel, None, "包含 CRLF 或 CR 换行")
+        report(rel, None, "contains CRLF or CR")
     if data and not data.endswith(b"\n"):
-        report(rel, None, "文件末尾缺少换行")
+        report(rel, None, "missing final newline")
     text = data.decode("utf-8", errors="replace")
     for number, line in enumerate(text.splitlines(), 1):
         if "\t" in line:
-            report(rel, number, "包含 Tab")
+            report(rel, number, "contains a tab")
         stripped = line.rstrip(" \t")
         if stripped != line:
             markdown_break = rel.endswith(".md") and line.endswith("  ") and not line.endswith("   ")
             if not markdown_break:
-                report(rel, number, "行尾空白")
+                report(rel, number, "trailing whitespace")
 
-print(f"检查格式 {checked} 个文件 | 错误 {len(fails)}")
+print(f"checked {checked} files | {len(fails)} errors")
 for line in fails[:50]:
     print(f"FAIL {line}")
 if len(fails) > 50:
-    print(f"FAIL ... 其余 {len(fails) - 50} 项省略")
+    print(f"FAIL ... {len(fails) - 50} more omitted")
 sys.exit(1 if fails else 0)
 PY

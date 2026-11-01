@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a defect in a seed, protocol, script, or generated baseline
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report security vulnerabilities here. Use the private advisory link instead.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+      description: A clear and concise description of the defect.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include the user request, the profile, and the affected files.
+      placeholder: |
+        1. Run ...
+        2. Load ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Seed version
+      description: Output of `cat SEEDS_VERSION`.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Agent platform
+      description: Claude Code, Cursor, Codex, or another platform.
+  - type: textarea
+    id: checks
+    attributes:
+      label: Check output
+      description: Paste the relevant output of check-format, verify-seeds, or test-fixtures.

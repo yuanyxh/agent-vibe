@@ -1,55 +1,55 @@
-# 脚手架规范
+# Scaffold conventions
 
-核心仓库只定义**结构要求**，不定义具体框架的目录与配置。具体技术结构由两种方式提供：可选的 `packs/`，或 agent 按本规范现场生成。
+The core repository defines **structural requirements**, not the directory layout or configuration of a specific framework. Concrete technical structure comes from one of two sources: an optional technology pack under `packs/`, or the agent generating it from these conventions.
 
-## 生成来源优先级
+## Generation priority
 
-1. `packs/` 中存在匹配画像的技术包 → 按包生成。
-2. 无匹配技术包 → agent 依据本规范与所选技术栈的公开约定生成最小可运行结构。
-3. 两种方式都必须执行 `protocols/verify.md`，命令不通过即视为失败。
+1. A matching technology pack exists in `packs/` → generate from the pack.
+2. No matching pack → the agent generates a minimal runnable structure from these conventions and the public conventions of the chosen stack.
+3. Both paths must run `protocols/en/verify.md`; a failing command counts as a failure.
 
-## 通用要求
+## General requirements
 
-任何项目生成后必须具备：
+Every generated project must have:
 
-| 项 | 判据 |
+| Item | Criterion |
 | --- | --- |
-| 依赖清单 | 声明全部运行与开发依赖，锁定版本 |
-| 入口 | 有明确启动入口，运行命令可用 |
-| 构建 | 有构建命令，产物可复现 |
-| 测试 | 有测试命令，至少包含一个可执行测试 |
-| 配置 | 环境差异通过配置注入，示例配置不含真实凭据 |
-| 文档 | README 说明安装、运行、测试 |
-| 忽略规则 | 版本控制忽略构建产物、依赖目录与本地配置 |
-| 本地钩子 | 可执行，`core.hooksPath` 已配置，命令与 `verify.format` / `verify.lint` 一致 |
+| Dependency manifest | Declares all runtime and development dependencies; versions are locked |
+| Entry point | A clear startup entry; the run command works |
+| Build | A build command; artifacts are reproducible |
+| Tests | A test command; at least one executable test |
+| Configuration | Environment differences are injected through configuration; sample configuration contains no real credentials |
+| Documentation | README explains install, run, and test |
+| Ignore rules | Version control ignores build outputs, dependency directories, and local configuration |
+| Local hooks | Executable, `core.hooksPath` configured, and commands match `verify.format` / `verify.lint` |
 
-## 按形态的结构要素
+## Structural elements by project type
 
-| 形态 | 必须具备 | 不应包含 |
+| Type | Required | Must not contain |
 | --- | --- | --- |
-| web | 入口页面、路由或视图组织、样式方案、构建产物 | 服务端密钥 |
-| backend | 启动入口、路由/接口层、配置加载、健康检查 | 前端构建链 |
-| cli | 命令入口、参数解析、退出码、帮助输出 | 常驻服务进程 |
-| library | 公共入口、导出清单、文档、版本策略 | 示例业务逻辑 |
-| mobile | 应用入口、页面组织、平台配置、构建目标 | 与平台无关的服务端代码 |
-| desktop | 主进程与界面入口、打包配置、平台签名占位 | 未声明的原生依赖 |
+| web | Entry page, routing or view organization, styling approach, build output | Server-side secrets |
+| backend | Startup entry, routing/API layer, configuration loading, health check | Frontend build chain |
+| cli | Command entry, argument parsing, exit codes, help output | A long-running service process |
+| library | Public entry, export manifest, documentation, version policy | Example business logic |
+| mobile | Application entry, page organization, platform configuration, build targets | Platform-independent server code |
+| desktop | Main process and UI entry, packaging configuration, platform signing placeholder | Undeclared native dependencies |
 
-## 钩子与模板
+## Hooks and templates
 
-| 模板 | 落点 | 要求 |
+| Template | Destination | Requirement |
 | --- | --- | --- |
-| `hooks/pre-commit` | `.githooks/pre-commit` | 替换 `{{verify.format}}`、`{{verify.lint}}`、`{{verify.typecheck}}`，未声明替换为 `none`；可执行 |
-| `hooks/commit-msg` | `.githooks/commit-msg` | 按 VCS-02 校验 `类型(范围): 摘要`；可执行 |
-| `github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | `repo_host=github` 时生成 |
+| `hooks/pre-commit` | `.githooks/pre-commit` | Replace `{{verify.format}}`, `{{verify.lint}}`, `{{verify.typecheck}}`; use `none` when undeclared; executable |
+| `hooks/commit-msg` | `.githooks/commit-msg` | Validate `type(scope): summary` per VCS-02; executable |
+| `github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | Generated when `repo_host=github` |
 
-安装使用 `git config core.hooksPath .githooks`。钩子与 CI 必须执行同一组命令，失败阻止提交。
+Install with `git config core.hooksPath .githooks`. Hooks and CI must run the same commands; a failure blocks the commit.
 
-## 最小化原则
+## Minimalism
 
-- 只生成让项目可运行、可测试、可构建所需的文件。
-- 不预置业务代码、示例页面、未使用的依赖。
-- 生成的每个文件都必须在构建或验证中实际被使用。
+- Generate only the files needed for the project to run, test, and build.
+- Do not pre-populate business code, sample pages, or unused dependencies.
+- Every generated file must be used by the build or by verification.
 
-## 完成判据
+## Done criterion
 
-在空目录中生成后，安装、构建、测试三条命令全部成功，且产物中不存在占位符。
+After generating in an empty directory, the install, build, and test commands all succeed, and no placeholders remain in the output.

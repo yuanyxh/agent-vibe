@@ -1,78 +1,134 @@
 # agent-vibe
 
-一个与具体技术、具体项目无关的 Agent 开发种子仓库。fork 它，加载 `init`，agent 会问完项目画像，然后把规则、技能与项目结构实例化到你所用 Agent 的标准位置。
+[![Seed checks](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml/badge.svg?branch=main)](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Seed version](https://img.shields.io/badge/seeds-1.1.0-informational)](SEEDS_VERSION)
 
-## 它不是什么
+English | [中文](README.zh.md)
 
-- 不是脚手架集合：不预置 React、Spring 或 Flutter 的代码。
-- 不是规则文档库：规则以种子形式存在，按项目画像筛选后才落地。
-- 不是运行时框架：仓库本身不被执行。
+A technology- and project-agnostic seed repository for agent-assisted software development. Fork it, load the `init` skill, and the agent interviews you about the project profile before instantiating rules, skills, and project structure into the locations your agent platform expects.
 
-## 它是什么
+## Why
 
-- `seeds/`：抽象种子。原则、能力、规则、技能、问题树与结构要求，全部与技术和平台无关。
-- `seeds/capabilities/`：能力定义。说明要保证什么、何时触发、要问什么、要查什么、如何验证；具体产物在上下文确定后生成。记忆能力只定义协议与降级，不内置任何记忆内容。
-- `seeds/domains/`：领域定义规范与高频参考定义。领域是开放集合，命中参考定义则复用，未命中时按上下文生成。
-- `seeds/knowledge/`：通用架构知识包。鉴权、权限、缓存、队列、文件、通知、一致性、时区、导入导出、PDF、更新、配置、测试、组件、部署、可观测性、系统定义；按主题加载，不整册注入。
-- `protocols/`：生长、提炼、校验、演进、升级、加载、研究、环境探测与记忆协议。规则带生命周期与加载方式，按平台能力按需加载。
-- `adapters/`：平台映射。把种子写到 Claude Code、Cursor、Codex 或通用 `AGENTS.md` 的约定位置。
-- `packs/`：可选技术包。核心仓库留空；需要固定某技术栈的项目结构时再自行添加。
+Agent setups usually start with a pile of prompts and a vague sense of "write clean code". That order produces context that is too large, too specific, or too late.
 
-## 能力手册
+agent-vibe flips the order: profile first, seeds second, project last. The project profile decides which rules, capabilities, domain definitions, and knowledge packs are worth loading. Everything else stays out of context until it is needed.
 
-每项能力做什么、什么时候触发、用了会得到什么：见 [CAPABILITIES.md](CAPABILITIES.md)。
+## What it is not
 
-## 三步开始
+- Not a scaffold collection: it does not ship ready-made application code.
+- Not a rule document dump: rules are seeds, selected by the project profile before they land.
+- Not a runtime framework: the repository itself is not executed.
 
-1. fork 或复制本仓库到你的新项目目录。
-2. 按 `adapters/<你的平台>/install.md` 安装入口技能，让平台能自动触发 `init`。
-3. 对 agent 说“我要做一个 X”或“开始”。`init` 会逐轮提问，直到画像与领域必问项完备。
-4. 确认画像后，agent 在目标目录生成工程基座：项目骨架、工程化配置、`.agent/`、规则、技能与启动契约。
-5. 你确认基座后，init 结束。后续功能开发在目标项目目录执行 `build`，不在种子仓库内进行。
+## What it is
 
-## 生成后你会得到
-
-以 Claude Code 为例；其他平台的落点见 `adapters/`。
-
-```
-<project>/
-├── <项目正常结构>              # 按画像生成
-├── .githooks/{pre-commit,commit-msg}  # 提交前检查与提交信息校验
-├── .github/PULL_REQUEST_TEMPLATE.md   # GitHub 项目的合并前清单
-├── CLAUDE.md                   # 启动契约：常驻底线 + 加载索引
-├── .claude/
-│   ├── skills/                 # 技能正文，按需触发
-│   └── rules/                  # 仅带 paths 的路径规则
-└── .agent/
-    ├── profile.yaml            # 项目画像，含 seed_version
-    ├── research.md             # 最佳实践研究简报
-    ├── rules/                  # 任务型规则，由技能读取
-    ├── memory/                 # INDEX.md 索引 + 主题文件
-    ├── status.md               # 单一事实源
-    ├── decisions.md            # 决策日志
-    └── lessons.md              # 自学习沉淀
-```
-
-常驻只有 `CLAUDE.md`；其余按路径、技能或显式读取进入上下文，规则见 `protocols/loading.md`。`.agent/` 是平台无关的状态目录，所有平台共用；其余路径由适配器决定。
-
-## 后续循环
-
-| 场景 | 加载 |
+| Area | Purpose |
 | --- | --- |
-| 日常开发 | `build` |
-| 缺陷排查 | `hunt` |
-| 变更审查 | `review` |
-| 经验沉淀 | `learn` |
-| 并行子任务 | `delegate` |
-| 依赖与框架升级 | `upgrade` |
-| 发布 | `ship` |
-| 运行期维护 | `operate` |
+| `seeds/en/` | Abstract seeds: principles, capabilities, rules, skills, question trees, and structural requirements, all independent of a specific technology or platform. |
+| `seeds/zh/` | The Chinese mirror of the same seeds. `seeds/en/` is authoritative for generation. |
+| `seeds/en/capabilities/` | Capability definitions: what must be guaranteed, when to trigger, what to ask, what to research, and how to verify. Concrete outputs are generated after the context is known. |
+| `seeds/en/domains/` | Domain definition schema and high-frequency reference domains. Domains are an open set: reuse a reference when it matches, otherwise generate one from context. |
+| `seeds/en/knowledge/` | General architecture knowledge packs: authentication, authorization, caching, queues, files, notifications, consistency, time zones, import/export, PDF, updates, configuration, testing, components, deployment, observability, and system definition. Load by topic, never wholesale. |
+| `protocols/en/` | Protocols for growth, distillation, verification, evolution, upgrades, loading, research, environment discovery, and memory. Rules carry a lifecycle and a loading mechanism. |
+| `adapters/en/` | Platform mappings: where seeds land for Claude Code, Cursor, Codex, or a generic `AGENTS.md`. |
+| `packs/` | Optional technology packs. The core repository ships none; add your own when a project needs a fixed stack. |
+| `examples/en/` | Complete walkthroughs and domain examples. Not read by `init`. |
 
-## 维护种子
+Every directory under `protocols/`, `adapters/`, `examples/`, `packs/`, and `seeds/` has an `en/` and a `zh/` version. The `en/` tree is the source used for generation. Root-level documents use a language suffix instead: `README.md` and `README.zh.md`.
 
-新增能力只需新增种子，不改目录结构。规则见 `protocols/`。
+## Quick start
 
-- 种子仓库版本见 `SEEDS_VERSION`，变更记录见 `CHANGELOG.md`；生成项目按 `protocols/upgrade-seeds.md` 升级。
-- 外部规则库只作人工补充来源，不自动同步；导入内容先去掉项目细节再按种子格式重写。
-- 改动后执行 `scripts/check-format.sh`、`scripts/verify-seeds.sh --strict` 与 `scripts/test-fixtures.sh`；CI 在推送与合并请求时执行同一组检查。
-- 首次 clone 后执行 `git config core.hooksPath .githooks`，提交前自动校验。
+1. Fork or copy this repository into your new project directory.
+2. Install the entry skill using `adapters/en/<your-platform>/install.md` so the platform can trigger `init` automatically.
+3. Tell the agent "I want to build an X" or "start". `init` asks one round of questions at a time until the profile and the required domain questions are complete.
+4. Confirm the profile. The agent generates the engineering baseline in the target directory: project skeleton, engineering configuration, `.agent/`, rules, skills, and the startup contract.
+5. After you confirm the baseline, `init` ends. Continue feature work in the target project with `build`, not in this seed repository.
+
+## Repository layout
+
+```text
+agent-vibe/
+├── README.md / README.zh.md
+├── CAPABILITIES.md / CAPABILITIES.zh.md
+├── AGENTS.md / AGENTS.zh.md
+├── CHANGELOG.md / CHANGELOG.zh.md
+├── CONTRIBUTING.md / CONTRIBUTING.zh.md
+├── SECURITY.md / SECURITY.zh.md
+├── LICENSE
+├── SEEDS_VERSION
+├── seeds/
+│   ├── en/                  # authoritative seeds
+│   ├── zh/                  # Chinese mirror
+│   └── scaffolds/           # platform-neutral hooks and templates
+├── protocols/{en,zh}/
+├── adapters/{en,zh}/
+├── examples/{en,zh}/
+├── packs/{en,zh}/
+├── scripts/                 # repository checks, not shipped as seeds
+├── tests/                   # golden fixtures for instantiation checks
+└── .github/                 # CI and community templates
+```
+
+## Capabilities
+
+What each capability does, when it triggers, and what you get: see [CAPABILITIES.md](CAPABILITIES.md).
+
+## What you get after init
+
+The example below uses Claude Code. Other platforms are described under `adapters/en/`.
+
+```text
+<project>/
+├── <normal project structure>          # generated from the profile
+├── .githooks/{pre-commit,commit-msg}   # pre-commit checks and commit message validation
+├── .github/PULL_REQUEST_TEMPLATE.md    # pre-merge checklist for GitHub projects
+├── CLAUDE.md                           # startup contract: always-on baseline + loading index
+├── .claude/
+│   ├── skills/                         # skill bodies, triggered on demand
+│   └── rules/                          # path-scoped rules only
+└── .agent/
+    ├── profile.yaml                    # project profile, including seed_version
+    ├── research.md                     # best-practice research brief
+    ├── rules/                          # task rules read by skills
+    ├── memory/                         # INDEX.md plus topic files
+    ├── status.md                       # single source of truth
+    ├── decisions.md                    # decision log
+    └── lessons.md                      # self-learning record
+```
+
+Only `CLAUDE.md` is always loaded. Everything else enters context by path, by skill, or by explicit read; the rules live in `protocols/en/loading.md`. `.agent/` is platform-neutral and shared by all platforms. The remaining paths are decided by the adapter.
+
+## Ongoing loop
+
+| Situation | Load |
+| --- | --- |
+| Day-to-day development | `build` |
+| Defect investigation | `hunt` |
+| Change review | `review` |
+| Experience distillation | `learn` |
+| Parallel subtasks | `delegate` |
+| Dependency and framework upgrades | `upgrade` |
+| Release | `ship` |
+| Runtime maintenance | `operate` |
+
+## Seed versioning
+
+- The seed repository version is in `SEEDS_VERSION`; changes are recorded in `CHANGELOG.md`.
+- Generated projects record `seed_version` in `.agent/profile.yaml` and upgrade via `protocols/en/upgrade-seeds.md`.
+- External rule libraries are a manual source of inspiration only. Nothing is synchronized automatically; imported material is stripped of project details and rewritten in seed format.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Before opening a pull request, run:
+
+```bash
+scripts/check-format.sh
+scripts/verify-seeds.sh --strict
+scripts/test-fixtures.sh
+```
+
+CI runs the same checks on every push and pull request.
+
+## License
+
+[MIT](LICENSE)

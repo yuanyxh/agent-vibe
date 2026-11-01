@@ -1,12 +1,21 @@
-# 变更记录
+# Changelog
 
-种子仓库以 `SEEDS_VERSION` 为对外版本，使用语义版本。生成项目在 `.agent/profile.yaml` 记录 `seed_version`，升级按 `protocols/upgrade-seeds.md` 执行。
+The seed repository is versioned by `SEEDS_VERSION` using semantic versioning. Generated projects record `seed_version` in `.agent/profile.yaml` and upgrade per `protocols/en/upgrade-seeds.md`.
+
+## 1.1.0 - 2026-11-01
+
+- Restructure documentation into `en/` and `zh/` trees under `seeds/`, `protocols/`, `adapters/`, `examples/`, and `packs/`.
+- Make English the authoritative documentation language and add a complete Chinese mirror.
+- Add `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue templates, and an expanded `.gitignore`.
+- Extend `scripts/verify-seeds.sh` to validate both language trees, their platform matrices, adapters, and cross-document links.
+- Translate user-facing script output to English.
+- Add bilingual README, CAPABILITIES, AGENTS, and CHANGELOG.
 
 ## 1.0.0 - 2026-10-29
 
-- 首次版本化：新增 `SEEDS_VERSION`、本记录与 `protocols/upgrade-seeds.md`。
-- 新增 Codex 适配器；`generic` 只覆盖通用平台。
-- 新增 5 个高频领域参考定义：web-app、backend、cli、web-marketing、desktop。
-- 记忆协议新增条目编号、容量归档与外部条目引用。
-- 新增实例化校验脚本与 golden fixture；种子自检扩展语义检查。
-- 新增 CI，推送与合并请求都执行种子校验。
+- First versioned release: add `SEEDS_VERSION`, this changelog, and `protocols/upgrade-seeds.md`.
+- Add the Codex adapter; `generic` now covers generic platforms only.
+- Add five high-frequency domain reference definitions: web-app, backend, cli, web-marketing, desktop.
+- Add entry numbering, capacity archival, and external entry references to the memory protocol.
+- Add instantiation checks and a golden fixture; extend semantic checks in the seed verifier.
+- Add CI so seed checks run on every push and pull request.

@@ -1,0 +1,44 @@
+name: Feature request
+description: Propose a new seed, capability, domain, or protocol change
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep proposals technology- and project-agnostic. A seed must be instantiable by projects with different stacks.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What situation is not covered today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Name the seed kind, the trigger, and the expected artifact.
+    validations:
+      required: true
+  - type: textarea
+    id: generic
+    attributes:
+      label: Why it is generic
+      description: Explain how at least two different stacks would use it.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing seeds, external rule libraries, or a smaller change.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing seeds and did not find an equivalent.
+          required: true
+        - label: I am willing to update both the en and zh trees.
+          required: true

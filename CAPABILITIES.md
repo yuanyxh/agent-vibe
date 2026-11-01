@@ -1,116 +1,116 @@
-# 能力手册
+# Capabilities
 
-这份文档回答三件事：**有什么能力、什么时候用、用了会得到什么**。
+This document answers three questions: **what capabilities exist, when to use them, and what you get**.
 
-## 一分钟理解
+## Understand it in one minute
 
-| 层 | 作用 | 一句话 |
+| Layer | Role | In one sentence |
 | --- | --- | --- |
-| 规则 `seeds/rules/` | 不能做什么 | 安全、权限、提交、文件操作的底线 |
-| 能力 `seeds/capabilities/` | 要保证什么 | 环境、记忆、治理、供应链、运维等 |
-| 技能 `seeds/skills/` | 遇到什么做什么 | 初始化、开发、排查、审查、发布 |
-| 知识 `seeds/knowledge/` | 怎么做更好 | 鉴权、缓存、队列、一致性等模式 |
-| 领域 `seeds/domains/` | 这类项目的专业问题 | 官网、后台、后端、CLI、桌面等 |
+| Rules `seeds/en/rules/` | What you must not do | Safety, permissions, commits, and file-operation guardrails |
+| Capabilities `seeds/en/capabilities/` | What must be guaranteed | Environment, memory, governance, supply chain, operations |
+| Skills `seeds/en/skills/` | What to do in a situation | Init, build, hunt, review, release |
+| Knowledge `seeds/en/knowledge/` | How to do it better | Authentication, caching, queues, consistency, and other patterns |
+| Domains `seeds/en/domains/` | Professional concerns for this kind of project | Marketing site, admin console, backend, CLI, desktop |
 
-规则和能力是“约束”，技能是“动作”，知识是“参考”，领域是“专业关注点”。
+Rules and capabilities are constraints. Skills are actions. Knowledge is reference material. Domains are professional concerns.
 
-## 一、启动一个项目
+## 1. Starting a project
 
-| 能力 | 你可能会说 | Agent 会做 | 你会看到 |
+| Capability | You might say | The agent will | You will see |
 | --- | --- | --- | --- |
-| 项目初始化 | “从零做一个……” | 逐轮提问、确认画像、生成工程基座并结束 | 目标项目、`.agent/`、`.claude/`、启动契约；业务开发在目标项目用 `build` |
-| 环境探测 | “换电脑了”“跑不起来” | 探测工具版本，给出替代或阻塞 | `.agent/environment.md` |
-| 领域定义 | “做一个 3D / 官网 / 后端” | 命中 `seeds/domains/` 参考定义则复用，否则生成核心问题与覆盖表 | `.agent/domains/<name>.md` |
-| 最佳实践研究 | “这个栈现在怎么做更稳” | 查官方版本、弃用与推荐组合，记录采纳与拒绝理由 | `.agent/research.md` |
-| Agent 资产盘点 | “有没有现成的 skill / rule”“会不会冲突” | 盘点项目、用户与插件资产，评估来源、许可与冲突 | 研究简报中的盘点结论 |
-| 知识包 | “权限一般怎么做” | 读对应主题，给模式、取舍与验证 | 方案建议，不整册注入 |
-| 记忆 | “上次那个决定是什么” | 查状态、决策、教训、长期记忆 | 恢复上下文，不靠对话记忆 |
+| Project init | "Build an X from scratch" | Interview you round by round, confirm the profile, generate the engineering baseline, and stop | Target project, `.agent/`, `.claude/`, startup contract; feature work continues in the target project with `build` |
+| Environment discovery | "I changed computers" or "it will not run" | Probe tool versions and propose alternatives or blockers | `.agent/environment.md` |
+| Domain definition | "Build a 3D / marketing / backend project" | Reuse a reference from `seeds/en/domains/` when it matches, otherwise generate core questions and a coverage table | `.agent/domains/<name>.md` |
+| Best-practice research | "What is the stable way to do this today?" | Check official versions, deprecations, and recommended combinations; record accepted and rejected options with reasons | `.agent/research.md` |
+| Agent asset inventory | "Is there an existing skill or rule?" or "will this conflict?" | Inventory project, user, and plugin assets; assess provenance, licenses, and conflicts | Inventory conclusions in the research brief |
+| Knowledge packs | "How is authorization usually done?" | Read the matching topic and give patterns, tradeoffs, and verification | A proposal, never a wholesale dump |
+| Memory | "What was that decision last time?" | Read status, decisions, lessons, and long-term memory | Restored context without relying on conversation history |
 
-## 二、日常开发
+## 2. Day-to-day development
 
-| 技能 | 你可能会说 | Agent 会做 | 你会看到 |
+| Skill | You might say | The agent will | You will see |
 | --- | --- | --- | --- |
-| `build` | “开发这个”“接着做” | 读状态、小步实现、自测、给提交建议 | 代码、状态更新、提交建议 |
-| `hunt` | “报错”“不工作”“回归了” | 复现、缩小范围、根因、修复、回归 | 修复、根因、`.agent/lessons.md` |
-| `review` | “看看改动”“合并前看一下” | 审查 diff、核对规则、给出结论 | 按严重度排序的发现 |
-| `learn` | “记录一下”“复盘” | 提炼有证据的经验，提议晋升 | 项目教训或种子候选 |
-| `upgrade` | “依赖旧了”“有漏洞” | 盘点、分级、分批升级、验证 | 升级记录与回滚点 |
-| `delegate` | “并行做”“交给子 agent” | 只传目标、边界、验收、资源位置 | 子任务结果，不污染判断 |
-| 工具推荐 | “有没有更好的办法” | 给候选、理由、成本、替代 | 推荐与决策记录 |
+| `build` | "Implement this" or "continue" | Read status, implement in small steps, self-test, and suggest a commit | Code, status updates, commit suggestions |
+| `hunt` | "It errors", "it does not work", "it regressed" | Reproduce, narrow the scope, find the root cause, fix, and add a regression check | Fix, root cause, `.agent/lessons.md` |
+| `review` | "Look at the diff" or "check before merging" | Review the diff, check the rules, and give a verdict | Findings ordered by severity |
+| `learn` | "Record this" or "retrospective" | Distill evidence-backed lessons and propose promotion | Project lessons or seed candidates |
+| `upgrade` | "Dependencies are old" or "there is a vulnerability" | Inventory, classify, batch upgrades, and verify | Upgrade record and rollback points |
+| `delegate` | "Run this in parallel" or "hand it to a subagent" | Pass only the goal, boundaries, acceptance criteria, and resource locations | Subtask results that do not contaminate your judgment |
+| Tool recommendation | "Is there a better way?" | Give candidates, reasons, costs, and alternatives | Recommendation and decision record |
 
-## 三、交付与维护
+## 3. Delivery and operations
 
-| 能力/技能 | 你可能会说 | Agent 会做 | 你会看到 |
+| Capability or skill | You might say | The agent will | You will see |
 | --- | --- | --- | --- |
-| `ship` | “上线”“发版” | 检查质量门、发布、验证、回滚预案 | 发布记录与回滚方式 |
-| `operate` | “线上怎么样”“有告警” | 汇总监控、异常、反馈、成本 | 运行报告与下一步 |
-| 发布能力 | “交付给客户” | 版本策略、构建、签名、分发 | 可追溯的发布产物 |
-| 可观测性 | “线上问题难查” | 日志、指标、追踪、告警 | 可定位的信号 |
-| 数据能力 | “要备份”“要删除” | 迁移、备份、保留与删除策略 | 可执行的方案 |
-| 种子升级 | “同步种子”“上游规则更新了” | 比对 `SEEDS_VERSION`、分类合并、登记冲突 | 更新的基座、`seed_version` 与迁移记录 |
+| `ship` | "Go live" or "release" | Check quality gates, release, verify, and prepare a rollback plan | Release record and rollback procedure |
+| `operate` | "How is production?" or "there is an alert" | Summarize monitoring, incidents, feedback, and cost | Operations report and next steps |
+| Release capability | "Deliver it to the customer" | Version strategy, build, signing, and distribution | Traceable release artifacts |
+| Observability | "Production issues are hard to diagnose" | Logs, metrics, traces, and alerts | Signals you can act on |
+| Data capability | "We need backups" or "we need deletion" | Migration, backup, retention, and deletion strategy | An executable plan |
+| Seed upgrade | "Sync the seeds" or "upstream rules changed" | Compare `SEEDS_VERSION`, classify and merge, record conflicts | Updated baseline, `seed_version`, and migration record |
 
-## 四、项目治理
+## 4. Project governance
 
-| 能力 | 你可能会说 | Agent 会做 | 你会看到 |
+| Capability | You might say | The agent will | You will see |
 | --- | --- | --- | --- |
-| 开发环境 | “我用 VS Code / IDEA” | 查证该环境的当前做法后生成配置 | 编辑器配置或等价说明 |
-| 目标环境 | “支持 Chrome 120+ / Safari 17” | 查证兼容性写法与构建目标 | 兼容性声明与检查 |
-| 治理 | “要开源”“要多人协作” | 生成许可证、贡献指南、安全策略 | 社区健康文件 |
-| 供应链 | “生产项目”“要漏洞扫描” | 锁定、更新策略、审计、SBOM | 配置与报告 |
-| 文档 | “要交接”“新人看不懂” | 使用、架构、决策、故障排查 | 可执行的文档 |
-| 规则演进 | “这条规则过时了” | 复核、递增版本、替代或废弃 | 版本与替代关系 |
+| Development environment | "I use VS Code or IDEA" | Check the current practice for that environment before generating configuration | Editor configuration or an equivalent description |
+| Target environment | "Support Chrome 120+ or Safari 17" | Verify compatibility practices and build targets | Compatibility declaration and checks |
+| Governance | "We are open-sourcing this" or "several people will collaborate" | Generate a license, contribution guide, and security policy | Community health files |
+| Supply chain | "This is a production project" or "we need vulnerability scanning" | Locking, update policy, audit, and SBOM | Configuration and reports |
+| Documentation | "We need a handoff" or "newcomers cannot follow this" | Usage, architecture, decisions, and troubleshooting | Documentation people can act on |
+| Rule evolution | "This rule is outdated" | Review, bump the version, and supersede or deprecate | Version and replacement relationships |
 
-## 五、能力怎么被加载
+## 5. How capabilities are loaded
 
-分层、预算与平台机制只维护一份，见 `protocols/loading.md`。摘要：L0 契约常驻、L1 路径规则、L2 技能触发、L3 显式读取；契约 ≤ 200 行，核心内联 ≤ 60 行。
+Layers, budgets, and platform mechanisms live in one place: `protocols/en/loading.md`. Summary: L0 contract is always on, L1 path rules, L2 skill triggers, L3 explicit reads; the contract is at most 200 lines, and the inline core is at most 60 lines.
 
-## 六、完整示例
+## 6. Complete examples
 
-### 例 1：做一个产品官网
+### Example 1: Build a product marketing site
 
-> 你：帮我做一个产品官网，要能被搜索引擎收录。
+> You: Build a product marketing site that search engines can index.
 
-Agent：加载 `init` → 问行业、语言、内容维护方式、分析工具 → 查证当前构建与 SEO 最佳实践并写入 `.agent/research.md` → 生成 `web-marketing` 领域定义 → 读取 SEO 知识包 → 生成工程基座与启动契约 → 执行基座校验。
+Agent: Load `init` → ask about the industry, languages, content maintenance, and analytics → verify current build and SEO best practices into `.agent/research.md` → generate the `web-marketing` domain definition → read the SEO knowledge pack → generate the engineering baseline and startup contract → run the baseline checks.
 
-你会得到：项目结构、`.agent/domains/web-marketing.md`、分层加载策略、可构建的基座；页面结构、元数据、站点地图与抓取规则由后续 `build` 实现。
+You get: project structure, `.agent/domains/web-marketing.md`, a layered loading strategy, and a buildable baseline. Page structure, metadata, sitemap, and crawl rules are implemented by later `build` runs.
 
-### 例 2：换了一台电脑
+### Example 2: A new computer
 
-> 你：换电脑后跑不起来了。
+> You: It will not run after I changed computers.
 
-Agent：读 `.agent/environment.md` → 重新探测运行时、包管理器、构建工具 → 缺失项给替代方案，需要安装的先问你 → 更新环境记录 → 重新执行质量门。
+Agent: Read `.agent/environment.md` → re-probe the runtime, package manager, and build tools → propose alternatives for missing items, ask before installing anything → update the environment record → re-run quality gates.
 
-你会得到：可复现的环境说明，以及明确的缺失项与替代。
+You get: a reproducible environment description and an explicit list of missing items and alternatives.
 
-### 例 3：首页很慢
+### Example 3: The home page is slow
 
-> 你：首页加载很慢，帮我看看。
+> You: The home page loads slowly. Take a look.
 
-Agent：加载 `hunt` → 复现并采集数据 → 工具能力推荐浏览器性能分析 → 读取缓存与前端知识包 → 定位到具体资源或请求 → 修复 → 补回归检查 → 记录教训。
+Agent: Load `hunt` → reproduce and collect data → recommend browser performance tooling → read the caching and frontend knowledge packs → identify the specific resource or request → fix → add a regression check → record the lesson.
 
-你会得到：根因、修复、可复现的验证、经验记录。
+You get: the root cause, the fix, reproducible verification, and a lesson.
 
-### 例 4：三个人一起开发
+### Example 4: Three people working together
 
-> 你：这个项目有三个人一起开发。
+> You: Three people will work on this project.
 
-Agent：生成 `collaboration` 规则 → 确定分支策略、审查方式、变更日志 → 写入启动契约 → 后续每次变更按提交规范与审查流程执行。
+Agent: Generate the `collaboration` rule → define the branch strategy, review method, and changelog → write it into the startup contract → apply the commit and review process to every later change.
 
-你会得到：分支与审查约定、提交规范、可交接的状态文件。
+You get: branch and review conventions, commit rules, and handoff-ready status files.
 
-## 七、不想用某项能力
+## 7. Opting out
 
-不生成、不加载即可。画像里没有对应需求时，相关能力会被跳过，并在 `.agent/status.md` 记录原因，不会静默塞进项目。
+Do not generate it and do not load it. When the profile has no matching need, the capability is skipped and the reason is recorded in `.agent/status.md`. Nothing is silently added to the project.
 
-## 八、文件在哪
+## 8. Where files live
 
-| 想了解 | 看 |
+| To learn about | Look at |
 | --- | --- |
-| 全部规则 | `seeds/rules/` |
-| 全部能力 | `seeds/capabilities/` |
-| 全部技能 | `seeds/skills/` |
-| 全部知识包 | `seeds/knowledge/INDEX.md` |
-| 领域定义方法 | `seeds/domains/_schema.md` |
-| 生成与校验流程 | `protocols/` |
-| 种子版本与升级 | `SEEDS_VERSION`、`CHANGELOG.md`、`protocols/upgrade-seeds.md` |
-| 平台落点 | `adapters/` |
+| All rules | `seeds/en/rules/` |
+| All capabilities | `seeds/en/capabilities/` |
+| All skills | `seeds/en/skills/` |
+| All knowledge packs | `seeds/en/knowledge/INDEX.md` |
+| How to define a domain | `seeds/en/domains/_schema.md` |
+| Generation and verification flow | `protocols/en/` |
+| Seed version and upgrades | `SEEDS_VERSION`, `CHANGELOG.md`, `protocols/en/upgrade-seeds.md` |
+| Platform landing points | `adapters/en/` |

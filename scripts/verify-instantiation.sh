@@ -49,44 +49,46 @@ def check_contract():
     candidates = ["CLAUDE.md", "AGENTS.md", ".cursor/rules/core.mdc"]
     found = [c for c in candidates if os.path.isfile(os.path.join(ROOT, c))]
     if not found:
-        fail(".", "缺少启动契约（CLAUDE.md / AGENTS.md / .cursor/rules/core.mdc）")
+        fail(".", "missing startup contract (CLAUDE.md / AGENTS.md / .cursor/rules/core.mdc)")
         return
     for name in found:
         path = os.path.join(ROOT, name)
         text = read(path)
         if not text.strip():
-            fail(name, "契约为空")
+            fail(name, "contract is empty")
         lines = text.count("\n") + (0 if text.endswith("\n") else 1)
         if lines > 200:
-            fail(name, f"契约 {lines} 行，超过 200 行预算")
-        if "加载" not in text or "验证" not in text:
-            warn(name, "契约未出现“加载”或“验证”章节")
+            fail(name, f"contract is {lines} lines, over the 200-line budget")
+        if not any(k in text for k in ("加载", "Loading")) or not any(
+            k in text for k in ("验证", "Verification")
+        ):
+            warn(name, "contract has no Loading or Verification section")
         start = text.find("<!-- core:start -->")
         end = text.find("<!-- core:end -->")
         if start == -1 and end == -1:
-            warn(name, "缺少 core 标记，无法核对核心 60 行预算")
+            warn(name, "missing core markers; cannot check the 60-line core budget")
         elif start == -1 or end == -1 or end < start:
-            fail(name, "core 标记不成对")
+            fail(name, "core markers are not paired")
         elif text[start:end].count("\n") > 60:
-            fail(name, "核心内联块超过 60 行预算")
+            fail(name, "inline core block exceeds the 60-line budget")
 
 
 def check_profile():
     path = os.path.join(ROOT, ".agent/profile.yaml")
     if not nonempty(path):
-        fail(".agent/profile.yaml", "缺失或为空")
+        fail(".agent/profile.yaml", "missing or empty")
         return None
     text = read(path)
     for field in ("name:", "type:", "agent:"):
         if not re.search(rf"(?m)^\s*{re.escape(field)}", text):
-            fail(".agent/profile.yaml", f"缺少字段 {field}")
+            fail(".agent/profile.yaml", f"missing field {field}")
     match = re.search(r"(?m)^seed_version:\s*(\S+)\s*$", text)
     version_file = os.path.join(REPO, "SEEDS_VERSION")
     expected = read(version_file).strip() if os.path.isfile(version_file) else ""
     if not match:
-        warn(".agent/profile.yaml", "缺少 seed_version，无法按版本升级")
+        warn(".agent/profile.yaml", "missing seed_version; cannot upgrade by version")
     elif expected and match.group(1) != expected:
-        warn(".agent/profile.yaml", f"seed_version={match.group(1)} 低于当前 {expected}，需要升级")
+        warn(".agent/profile.yaml", f"seed_version={match.group(1)} is older than {expected}; upgrade required")
     return text
 
 
@@ -101,9 +103,9 @@ def check_states():
     ]
     for name in required:
         if not nonempty(os.path.join(ROOT, name)):
-            fail(name, "缺失或为空")
+            fail(name, "missing or empty")
     if not os.path.isfile(os.path.join(ROOT, ".agent/memory/INDEX.md")):
-        warn(".agent/memory/INDEX.md", "缺失，长期记忆无法按编号检索")
+        warn(".agent/memory/INDEX.md", "missing; long-term memory cannot be indexed by number")
 
 
 def check_profile_domain(profile):
@@ -113,30 +115,30 @@ def check_profile_domain(profile):
         return
     domains = glob.glob(os.path.join(ROOT, ".agent/domains/*.md"))
     if not domains:
-        fail(".agent/domains/", "画像声明了 domain，但没有领域定义文件")
+        fail(".agent/domains/", "the profile declares a domain but there is no domain definition file")
     for path in domains:
         if not nonempty(path):
-            fail(rel(path), "领域定义为空")
+            fail(rel(path), "domain definition is empty")
 
 
 def check_rules():
     for path in glob.glob(os.path.join(ROOT, ".claude/rules/*.md")):
         text = read(path)
         if "paths:" not in front_matter(text):
-            fail(rel(path), "路径规则缺少 paths")
+            fail(rel(path), "path rule is missing paths")
         if len(text.splitlines()) > 120:
-            fail(rel(path), "路径规则超过 120 行预算")
+            fail(rel(path), "path rule exceeds the 120-line budget")
     for path in glob.glob(os.path.join(ROOT, ".cursor/rules/*.mdc")):
         text = read(path)
         meta = front_matter(text)
         is_core = os.path.basename(path) == "core.mdc"
         if not is_core and "alwaysApply: true" in meta:
-            fail(rel(path), "非核心规则不得 alwaysApply: true")
+            fail(rel(path), "non-core rule must not use alwaysApply: true")
         if not is_core and "globs:" not in meta and "description:" not in meta:
-            fail(rel(path), "路径规则缺少 globs 或 description")
+            fail(rel(path), "path rule is missing globs or description")
     for path in glob.glob(os.path.join(ROOT, ".agent/rules/*.md")):
         if len(read(path).splitlines()) > 120:
-            fail(rel(path), "按需规则超过 120 行预算")
+            fail(rel(path), "on-demand rule exceeds the 120-line budget")
 
 
 def check_skills():
@@ -150,18 +152,18 @@ def check_skills():
     for pattern in patterns:
         found += glob.glob(os.path.join(ROOT, pattern))
     if not found:
-        fail(".", "没有可触发的技能文件")
+        fail(".", "no triggerable skill files found")
         return
     for path in found:
         text = read(path)
         meta = front_matter(text)
         body = text.split("---", 2)[-1].strip() if meta else text.strip()
         if not body:
-            fail(rel(path), "技能正文为空")
+            fail(rel(path), "skill body is empty")
         if path.endswith("SKILL.md"):
             for field in ("name:", "description:"):
                 if field not in meta:
-                    fail(rel(path), f"技能头缺少 {field}")
+                    fail(rel(path), f"skill front matter is missing {field}")
 
 
 def check_metadata():
@@ -175,7 +177,7 @@ def check_metadata():
         if not os.path.isfile(path):
             continue
         if pattern.search(read(path)):
-            fail(rel(path), "残留种子元数据")
+            fail(rel(path), "seed metadata leaked into the target")
     for name in ("CLAUDE.md", "AGENTS.md"):
         path = os.path.join(ROOT, name)
         if not os.path.isfile(path):
@@ -183,7 +185,7 @@ def check_metadata():
         text = read(path)
         for token in ("{{", "<待填>"):
             if token in text:
-                fail(name, f"残留占位符 {token}")
+                fail(name, f"unresolved placeholder {token}")
 
 
 def parse_section(text, name):
@@ -221,16 +223,16 @@ def check_hooks(profile):
     for name in ("pre-commit", "commit-msg"):
         path = find_hook(name)
         if not path:
-            fail(f".githooks/{name}", f"缺少 {name} 钩子")
+            fail(f".githooks/{name}", f"missing {name} hook")
             continue
         hooks.append(path)
         if not os.access(path, os.X_OK):
-            fail(rel(path), "钩子不可执行")
+            fail(rel(path), "hook is not executable")
         text = read(path)
         if not text.strip():
-            fail(rel(path), "钩子为空")
+            fail(rel(path), "hook is empty")
         if "{{" in text:
-            fail(rel(path), "钩子存在未替换占位符")
+            fail(rel(path), "hook contains an unresolved placeholder")
     hook_label = rel(hooks[0]) if hooks else ".githooks/pre-commit"
     enforced = [read(path) for path in hooks]
     for pattern in (
@@ -254,21 +256,21 @@ def check_hooks(profile):
         if tool and tool != "none":
             candidates.append(tool)
         if not any(candidate.lower() in haystack for candidate in candidates):
-            fail(hook_label, f"钩子或 CI 未执行 verify.{key}: {command}")
+            fail(hook_label, f"hook or CI does not run verify.{key}: {command}")
     git_config = os.path.join(ROOT, ".git/config")
     if hooks and os.path.isfile(git_config):
         config = read(git_config)
         installed = "hooksPath" in config or os.path.isfile(os.path.join(ROOT, ".git/hooks/pre-commit"))
         if not installed:
-            warn(hook_label, "存在钩子但未确认 core.hooksPath 生效")
+            warn(hook_label, "hooks exist but core.hooksPath is not confirmed")
     if delivery.get("repo_host") == "github":
         templates = (".github/PULL_REQUEST_TEMPLATE.md", ".github/pull_request_template.md")
         if not any(os.path.isfile(os.path.join(ROOT, name)) for name in templates):
-            warn(".github/PULL_REQUEST_TEMPLATE.md", "GitHub 项目缺少 PR 模板")
+            warn(".github/PULL_REQUEST_TEMPLATE.md", "GitHub project is missing a PR template")
 
 
 if not os.path.isdir(ROOT):
-    print(f"FAIL 目标目录不存在: {ROOT}")
+    print(f"FAIL target directory does not exist: {ROOT}")
     sys.exit(1)
 
 check_contract()
@@ -280,7 +282,7 @@ check_skills()
 check_metadata()
 check_hooks(profile)
 
-print(f"检查实例化 {ROOT} | 错误 {len(fails)} | 警告 {len(warns)}")
+print(f"checked instantiation {ROOT} | {len(fails)} errors | {len(warns)} warnings")
 for line in fails:
     print(f"FAIL {line}")
 for line in warns:
