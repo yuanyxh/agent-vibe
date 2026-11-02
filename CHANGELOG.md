@@ -2,6 +2,12 @@
 
 The seed repository is versioned by `SEEDS_VERSION` using semantic versioning. Generated projects record `seed_version` in `.agent/profile.yaml` and upgrade per `protocols/en/upgrade-seeds.md`.
 
+## 1.2.0 - 2026-11-02
+
+- Add `VCS-07` task branch isolation: verify a clean tree, create `<type>/<task-slug>` from the latest trunk, never develop directly on the trunk, and handle pre-existing changes explicitly.
+- Add `delivery.trunk_branch` to the project profile, startup contract, and instantiation flow.
+- Make `build` and `review` perform branch preflight and check branch base and workspace hygiene.
+
 ## 1.1.0 - 2026-11-01
 
 - Restructure documentation into `en/` and `zh/` trees under `seeds/`, `protocols/`, `adapters/`, `examples/`, and `packs/`.

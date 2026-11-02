@@ -1,9 +1,9 @@
 ---
 id: seed/rule/concern-vcs
 kind: rule
-version: 1
-updated: 2026-10-23
-review_by: 2027-01-23
+version: 2
+updated: 2026-11-02
+review_by: 2027-02-02
 status: active
 load: on-demand
 trigger: When committing, merging, cleaning up history or handling branches
@@ -66,3 +66,11 @@ verify: Each rule can be checked by git commands or logs
 **Prohibited**: Merging temporary commits from development directly into the trunk.
 
 **Verify**: The trunk history allows the project's evolution to be understood at commit granularity.
+
+## VCS-07 Task branch isolation
+
+**Rule**: Before starting a requirement or defect, run `git status --porcelain` and `git branch --show-current`. For `feature-branch`, create a short-lived branch from the latest trunk named `<type>/<task-slug>` (`type` is feat / fix / refactor / docs / chore) with `git switch <trunk> && git pull --ff-only && git switch -c <type>/<task-slug>`, and do all work for the task on it; for `trunk`, confirm the current branch is the trunk and synchronize with the remote before starting, and use a task branch for work that spans sessions or needs isolation. When the tree is dirty, stop and ask whether the changes belong to this task, should be committed, or should be stashed; never carry them silently. Delete the task branch after merge.
+
+**Prohibited**: Developing directly on the trunk or an unrelated branch; starting from a stale trunk; mixing unrelated uncommitted changes into the task branch.
+
+**Verify**: The branch name and base are recorded; the starting tree is clean or the ownership of existing changes is confirmed by the user; `git merge-base --is-ancestor origin/<trunk> HEAD` passes before merge.

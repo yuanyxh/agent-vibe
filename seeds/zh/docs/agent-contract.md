@@ -91,7 +91,7 @@ verify: 加载策略、技能索引、工作循环、断点规则四项齐全，
 
 ## 协作
 
-- 分支策略：`{{delivery.branch_strategy}}`。
+- 分支策略：`{{delivery.branch_strategy}}`；主干：`{{delivery.trunk_branch}}`。`feature-branch` 下每个任务从最新主干创建 `<type>/<task-slug>` 分支；`trunk` 下开始前确认主干干净且已同步。
 - 关键模块有明确审查者；接口与数据模型变更先更新文档。
 - 面向使用者的变更写入变更日志，破坏性变更附迁移说明。
 

@@ -91,7 +91,7 @@ Local hooks and CI run the same set of commands.
 
 ## Collaboration
 
-- Branch strategy: `{{delivery.branch_strategy}}`.
+- Branch strategy: `{{delivery.branch_strategy}}`; trunk: `{{delivery.trunk_branch}}`. With `feature-branch`, start every task from a `<type>/<task-slug>` branch created from the latest trunk; with `trunk`, confirm a clean, synchronized trunk before starting.
 - Key modules have designated reviewers; update documentation before changing interfaces or data models.
 - Write user-facing changes to the changelog, and attach migration notes to breaking changes.
 

@@ -2,6 +2,12 @@
 
 种子仓库以 `SEEDS_VERSION` 为对外版本，使用语义版本。生成项目在 `.agent/profile.yaml` 记录 `seed_version`，升级按 `protocols/zh/upgrade-seeds.md` 执行。
 
+## 1.2.0 - 2026-11-02
+
+- 新增 `VCS-07` 任务分支隔离：确认工作区干净，从最新主干创建 `<type>/<task-slug>` 分支，禁止在主干直接开发，并明确处理既有未提交改动。
+- 画像、启动契约与实例化流程新增 `delivery.trunk_branch`。
+- `build` 与 `review` 增加分支预检，并检查分支基点与工作区卫生。
+
 ## 1.1.0 - 2026-11-01
 
 - 文档改为 `seeds/`、`protocols/`、`adapters/`、`examples/`、`packs/` 下的 `en/` 与 `zh/` 双目录结构。

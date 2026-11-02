@@ -18,6 +18,7 @@ verify: Each increment is runnable and the status file is updated
 - The current directory must contain `.agent/profile.yaml`; when missing, run `init` first and do not write code directly.
 - If the current directory is the seed repository, stop and switch to the target project.
 - The base's rules, skills, and contract must be non-empty; an empty directory counts as uninitialized.
+- Branch preflight (when `delivery.vcs` is `git`): per VCS-07, read `delivery.branch_strategy` and `delivery.trunk_branch`, run `git status --porcelain` and `git branch --show-current`; when the tree is dirty, confirm the ownership of changes before coding.
 
 ## Goal
 
@@ -29,7 +30,7 @@ Before executing, read `.agent/rules/engineering.md`, `design.md`, `vcs.md`, and
 
 ## Steps
 
-1. **Read state**: read `.agent/status.md` and related rules to confirm the current goal, in-progress tasks, and blockers.
+1. **Read state and run branch preflight**: read `.agent/status.md` and related rules to confirm the current goal, in-progress tasks, and blockers; when `delivery.vcs` is `git`, per VCS-07 establish or confirm the task branch and never develop directly on the trunk or an unrelated branch. With `feature-branch`, create `<type>/<task-slug>` from the latest trunk; with `trunk`, confirm the current branch is the latest trunk.
 2. **Define the increment**: choose the smallest slice that can be completed and verified within a single session. Decompose first when scope is unclear; do not guess requirements. Distinguish goals from examples per REQ-01, and list non-goals when confirming scope; when multiple reasonable interpretations exist, record the candidate trade-offs per REQ-05.
 3. **Search for reuse**: before creating a module, function, or component, use project search means (full-text search, dependency graph, export list) to find existing implementations with the same responsibility and their callers; reuse or extend when a usable implementation exists, otherwise explain the reason for creating a new one in the delivery summary.
 4. **Implement**: follow the rules matching the current phase; change only task-related files. When `quality.test_level` is `strict`, write a failing test first for each slice per TST-05; fix defects per TST-02.
@@ -38,11 +39,12 @@ Before executing, read `.agent/rules/engineering.md`, `design.md`, `vcs.md`, and
 7. **Pre-commit checks**: confirm the diff contains only the changes intended for this task, with no generated artifacts, credentials, local configuration, or verification leftovers; generate the commit message per the commit convention.
 8. **Commit**: commits, pushes, and history rewrites are operations that require authorization. When the user has not explicitly authorized them, provide only commit suggestions and commands, do not execute.
 9. **Update state**: record completed items, next steps, and blockers in `.agent/status.md`; write decisions to `.agent/decisions.md`.
-10. **Deliver**: provide a change summary (including reuse or new-creation conclusions), verification commands and results, and commit status.
+10. **Deliver**: provide a change summary (including reuse or new-creation conclusions), verification commands and results, commit status, the current task branch, and merge/cleanup suggestions; merging and branch deletion require authorization.
 
 ## Completion criteria
 
 - The increment is runnable, and test results come from this actual execution.
+- The task branch is established or confirmed per VCS-07, and the starting tree is clean or the ownership of existing changes is confirmed by the user.
 - Formatting, lint, and type checks pass as required by the profile.
 - The workspace has no verification leftovers, and the diff contains only the changes intended for this task.
 - Commits are completed per convention, or a commit suggestion awaiting authorization is clearly provided.
@@ -53,6 +55,7 @@ Before executing, read `.agent/rules/engineering.md`, `design.md`, `vcs.md`, and
 ## Prohibited
 
 - Implementing multiple unrelated requirements at once.
+- Developing a task directly on the trunk or an unrelated branch; silently carrying the user's uncommitted changes into the task branch.
 - Replacing actual execution with "should work".
 - Overwriting or discarding the user's existing uncommitted changes.
 - Creating a unit that overlaps with existing implementations without searching first.

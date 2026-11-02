@@ -39,6 +39,7 @@ init maintains only one profile. Questioning, growth, and verification all use i
 | `delivery.vcs` | Yes | git | git / none |
 | `delivery.repo_host` | Yes | github | github / gitlab / gitee / local |
 | `delivery.branch_strategy` | Yes | Derived from team | trunk / feature-branch |
+| `delivery.trunk_branch` | Yes | Detected from the repository, otherwise main | Main branch name, used as the base for task branches |
 | `delivery.ci` | Yes | Recommended by repo_host | github-actions / gitlab-ci / none |
 | `delivery.deploy_target` | Yes | Recommended by type | static / serverless / container / vps / app-store / none |
 | `delivery.environments` | Yes | [dev, prod] | Environment list |
@@ -84,7 +85,7 @@ Each round asks at most four questions, only about missing fields whose prerequi
 2. **Technology stack**: Dynamically generate language, framework, package manager, and runtime options by `type`.
 3. **Interface**: Ask about design system, internationalization, and accessibility only when `ui.has_ui` is true.
 4. **Data**: Storage, authentication, files, third-party services.
-5. **Delivery**: Version control, repository hosting, branch strategy, CI, deployment target, environments, domain.
+5. **Delivery**: Version control, repository hosting, branch strategy and trunk branch, CI, deployment target, environments, domain.
 6. **Quality**: Test level, security level, formatting, static checks, type checks, performance budget, compliance requirements.
 7. **Collaboration**: Ask about review method and changelog requirements only when `team != solo`.
 8. **Environment**: Editor and toolchain preferences, target platforms and versions, hard constraints. Do not press for items the user did not mention; register them as pending growth.
@@ -99,7 +100,7 @@ Fields that can be inferred from existing answers or repository facts are not as
 - When `type = web`, `ui.has_ui = true`.
 - When `repo_host = github` and CI is unspecified, recommend `github-actions`.
 - When `scale = prototype` and the test level is unspecified, recommend `basic`.
-- Default `delivery.vcs` to `git` when unspecified; when `team = solo`, `branch_strategy = trunk`; otherwise `feature-branch`.
+- Default `delivery.vcs` to `git` when unspecified; when `team = solo`, `branch_strategy = trunk`; otherwise `feature-branch`. When a repository exists, detect its default branch as `trunk_branch`; otherwise default to `main`.
 - Recommend mainstream tools for `quality.format/lint/typecheck` by language and derive the `verify.*` commands accordingly.
 - Derive `project.domain` from `type`, industry, and purpose; the name is free text and does not require a same-named definition to exist in the seed repository.
 - Derive `target.platforms` from `project.type`; verify version ranges during generation, and do not hardcode them here.

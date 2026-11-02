@@ -39,6 +39,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 | `delivery.vcs` | 是 | git | git / none |
 | `delivery.repo_host` | 是 | github | github / gitlab / gitee / local |
 | `delivery.branch_strategy` | 是 | 按 team 推导 | trunk / feature-branch |
+| `delivery.trunk_branch` | 是 | 从仓库探测，否则 main | 主干分支名，任务分支的基点 |
 | `delivery.ci` | 是 | 按 repo_host 推荐 | github-actions / gitlab-ci / none |
 | `delivery.deploy_target` | 是 | 按 type 推荐 | static / serverless / container / vps / app-store / none |
 | `delivery.environments` | 是 | [dev, prod] | 环境列表 |
@@ -84,7 +85,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 2. **技术栈**：按 `type` 动态生成语言、框架、包管理器、运行时选项。
 3. **界面**：仅在 `ui.has_ui` 为真时询问设计系统、国际化、可访问性。
 4. **数据**：存储、鉴权、文件、第三方服务。
-5. **交付**：版本控制、仓库托管、分支策略、CI、部署目标、环境、域名。
+5. **交付**：版本控制、仓库托管、分支策略与主干分支、CI、部署目标、环境、域名。
 6. **质量**：测试级别、安全级别、格式化、静态检查、类型检查、性能预算、合规要求。
 7. **协作**：仅在 `team != solo` 时询问审查方式与变更日志要求。
 8. **环境**：编辑器与工具链偏好、目标平台与版本、硬约束；用户未提及的项不追问，登记为待生长。
@@ -99,7 +100,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 - `type = web` 时 `ui.has_ui = true`。
 - `repo_host = github` 且未指定 CI 时推荐 `github-actions`。
 - `scale = prototype` 且未指定测试级别时推荐 `basic`。
-- 未指定 `delivery.vcs` 时默认 `git`；`team = solo` 时 `branch_strategy = trunk`，否则 `feature-branch`。
+- 未指定 `delivery.vcs` 时默认 `git`；`team = solo` 时 `branch_strategy = trunk`，否则 `feature-branch`。仓库已存在时探测其默认分支作为 `trunk_branch`，否则默认 `main`。
 - `quality.format/lint/typecheck` 按语言推荐主流工具，并同步推导 `verify.*` 命令。
 - `project.domain` 由 `type`、行业与用途推导，名称是自由文本；不要求在种子库中已存在同名定义。
 - `target.platforms` 由 `project.type` 推导；版本范围在生成时查证，不在此处硬编码。
