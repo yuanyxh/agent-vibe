@@ -30,15 +30,15 @@ Before executing, read `.agent/rules/engineering.md`, `design.md`, `vcs.md`, and
 
 ## Steps
 
-1. **Read state and run branch preflight**: read `.agent/status.md` and related rules to confirm the current goal, in-progress tasks, and blockers; when `delivery.vcs` is `git`, per VCS-07 establish or confirm the task branch and never develop directly on the trunk or an unrelated branch. With `feature-branch`, create `<type>/<task-slug>` from the latest trunk; with `trunk`, confirm the current branch is the latest trunk.
-2. **Define the increment**: choose the smallest slice that can be completed and verified within a single session. Decompose first when scope is unclear; do not guess requirements. Distinguish goals from examples per REQ-01, and list non-goals when confirming scope; when multiple reasonable interpretations exist, record the candidate trade-offs per REQ-05.
+1. **Read state and run branch preflight**: read `.agent/status.md`, the linked plan, `.agent/backlog.md`, and related rules to confirm the current goal, in-progress tasks, agreements, and blockers; when `delivery.vcs` is `git`, per VCS-07 establish or confirm the task branch and never develop directly on the trunk or an unrelated branch. With `feature-branch`, create `<type>/<task-slug>` from the latest trunk; with `trunk`, confirm the current branch is the latest trunk.
+2. **Define the increment**: choose the smallest slice that can be completed and verified within a single session. For a multi-step or multi-session task, copy `.agent/plans/_template.md` to `.agent/plans/<task-slug>.md` and fill it per CTX-04 before coding, including non-goals, acceptance, confirmed agreements, and ordered steps. Decompose first when scope is unclear; do not guess requirements. Distinguish goals from examples per REQ-01, and list non-goals when confirming scope; when multiple reasonable interpretations exist, record the candidate trade-offs per REQ-05.
 3. **Search for reuse**: before creating a module, function, or component, use project search means (full-text search, dependency graph, export list) to find existing implementations with the same responsibility and their callers; reuse or extend when a usable implementation exists, otherwise explain the reason for creating a new one in the delivery summary.
 4. **Implement**: follow the rules matching the current phase; change only task-related files. When `quality.test_level` is `strict`, write a failing test first for each slice per TST-05; fix defects per TST-02.
 5. **Self-test**: run the test and build commands declared by the project; explain when they cannot run. When a UI exists, also actually launch it once and take a screenshot or equivalent assertion; running the build alone does not count as self-testing. Label the evidence level per TST-07; when self-testing is impossible, output a handoff checklist per TST-09. Write verification data to the system temporary directory, not inside the project; when it must be inside the project, add ignore rules and clean up afterward.
-6. **Engineering checks**: run the formatting, lint, and type-check commands declared by the profile; fix any failure before continuing.
+6. **Engineering checks and plan reconciliation**: run the formatting, lint, and type-check commands declared by the profile; fix any failure before continuing. Update the current plan step with its status and evidence, and record any scope, order, or acceptance change per CTX-05.
 7. **Pre-commit checks**: confirm the diff contains only the changes intended for this task, with no generated artifacts, credentials, local configuration, or verification leftovers; generate the commit message per the commit convention.
 8. **Commit**: commits, pushes, and history rewrites are operations that require authorization. When the user has not explicitly authorized them, provide only commit suggestions and commands, do not execute.
-9. **Update state**: record completed items, next steps, and blockers in `.agent/status.md`; write decisions to `.agent/decisions.md`.
+9. **Update state**: mark plan steps done with evidence, move unfinished items to `.agent/backlog.md`, then record the progress summary, next action, and blockers in `.agent/status.md`; write decisions to `.agent/decisions.md`. Do not copy step detail into status.
 10. **Deliver**: provide a change summary (including reuse or new-creation conclusions), verification commands and results, commit status, the current task branch, and merge/cleanup suggestions; merging and branch deletion require authorization.
 
 ## Completion criteria
@@ -48,7 +48,7 @@ Before executing, read `.agent/rules/engineering.md`, `design.md`, `vcs.md`, and
 - Formatting, lint, and type checks pass as required by the profile.
 - The workspace has no verification leftovers, and the diff contains only the changes intended for this task.
 - Commits are completed per convention, or a commit suggestion awaiting authorization is clearly provided.
-- The status file is consistent with the code.
+- The status file is consistent with the code, the plan steps match actual evidence, and no agreed item exists only in conversation.
 - No undocumented dependency or configuration changes are introduced.
 - Existing implementations were searched before creating a shared unit, and the delivery summary explains the reuse or new-creation reasoning.
 

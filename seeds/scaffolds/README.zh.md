@@ -40,6 +40,7 @@
 | --- | --- | --- |
 | `hooks/pre-commit` | `.githooks/pre-commit` | 替换 `{{verify.format}}`、`{{verify.lint}}`、`{{verify.typecheck}}`，未声明替换为 `none`；可执行 |
 | `hooks/commit-msg` | `.githooks/commit-msg` | 按 VCS-02 校验 `type(scope): summary`；可执行 |
+| `hooks/agent-maintenance` | 适配器定义的钩子位置 | 体检报告缺失或过期时输出一行提醒；禁止联网；可执行 |
 | `github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | `repo_host=github` 时生成 |
 
 安装使用 `git config core.hooksPath .githooks`。钩子与 CI 必须执行同一组命令，失败阻止提交。

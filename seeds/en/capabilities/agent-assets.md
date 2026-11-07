@@ -46,3 +46,7 @@ Before generating the foundation, know what is already available, what can be us
 - Copying user-level rules or third-party skill content directly into the project.
 - Adopting a plugin of unknown origin that is unmaintained or has overly broad permissions.
 - Recording personal directories or internal addresses in documentation.
+
+## Boundary
+
+This capability performs the initial inventory before generation. Periodic health checks, rot detection, and consolidation after generation belong to `capability/agent-environment`.

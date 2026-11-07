@@ -15,11 +15,13 @@ verify: Status matches actual build results
 
 <One sentence describing the outcome to achieve in this phase>
 
+Plan: `.agent/plans/<task-slug>.md` (or none for a single reversible step)
+
 ## In Progress
 
-| Task | Status | Blocked |
-| --- | --- | --- |
-| <task> | <in progress/waiting> | <none/reason> |
+| Task | Plan step | Status | Blocked |
+| --- | --- | --- | --- |
+| <task> | <S1/S2/none> | <in progress/waiting> | <none/reason> |
 
 ## Completed
 
@@ -27,7 +29,7 @@ verify: Status matches actual build results
 
 ## Next Steps
 
-1. <next action>
+1. <next action; keep details in the plan or backlog, not here>
 
 ## Recent Verification
 
@@ -37,4 +39,4 @@ verify: Status matches actual build results
 
 ## Known Issues
 
-- <issue>: <impact and plan>
+- <issue>: <impact and plan link or backlog ID>

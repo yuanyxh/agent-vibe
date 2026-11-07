@@ -34,6 +34,8 @@ Load by task topic; take only the relevant entries per session, never inject the
 | Exceptions and traces | `observability.md` | Crashes, error reporting, user traces | Online issues are hard to locate |
 | System definition and standardization | `system-definition.md` | Project kickoff, terminology, boundaries | New project or multi-person collaboration |
 | Defect types and debugging techniques | `debugging-playbook.md` | Jank, memory, hangs, slow queries, UI display and interaction | Choosing debugging tools or locating root causes |
+| Code health | `code-health.md` | Architecture, anti-pattern, and dead-code detection | Architecture review, refactor, recurring defects |
+| Agent maintenance | `agent-maintenance.md` | Agent environment rot, memory/rule/skill drift | Periodic agent check, stale assets, repeated corrections |
 
 ## Loading rules
 

@@ -16,6 +16,7 @@ applies_when: { agent.platform: codex }
 | `rule/read` | `.agent/rules/<name>.md`，契约索引标记 `degraded` |
 | `contract` | `AGENTS.zh.md` |
 | `state/<name>` | `.agent/<name>.md`（`state/profile` 为 `.agent/profile.yaml`，`state/memory` 为 `.agent/memory/README.md`） |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | 项目根目录 |
 
 ## 技能格式
@@ -46,6 +47,15 @@ description: 何时触发，包含用户可能的说法
 - 没有原生机制的内容必须写明读取动作，不得写成“自动加载”。
 - `AGENTS.zh.md` ≤ 200 行，核心内联 ≤ 60 行，单个按需规则 ≤ 120 行；核心块用 `<!-- core:start -->` 与 `<!-- core:end -->` 包裹。
 
+## 钩子与调度
+
+机制类别、节流与降级遵循 `protocols/zh/maintenance.md`。
+
+- Codex Automations 可按计划或外部事件运行；项目允许云端执行时，用于周期性维护。
+- Codex CLI hooks 随版本变化。生成前必须查证当前版本是否支持目标事件与配置；无法确认时不生成钩子配置。
+- 没有钩子时降级为 `AGENTS.zh.md` 规则、显式 `$steward` 调用，以及操作系统或 CI 计划。
+- 技能通过 `$<name>` 或描述触发；描述要短且以触发条件为主。
+
 ## 资产盘点
 
 只读名称与描述，不复制内容，不记录个人路径。
@@ -54,7 +64,7 @@ description: 何时触发，包含用户可能的说法
 | --- | --- |
 | 项目 | `AGENTS.zh.md`、`.agents/skills/`、`.agent/rules/`、项目级 MCP 配置 |
 | 用户 | `~/.agents/skills/`、`~/.codex/config.toml` |
-| 插件与工具 | 平台列出的技能包与 MCP 服务 |
+| 插件与工具 | 平台列出的技能包、MCP 服务与已配置的 Automations |
 
 冲突时以项目规则和用户当前说明为准；第三方内容默认不采纳。
 

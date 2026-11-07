@@ -60,14 +60,21 @@ By default, none enters always-on, except the following:
 | Content | Layer | Read timing |
 | --- | --- | --- |
 | Profile summary (name, form, technology stack, quality budget) | L0 | Inlined into the contract |
-| `.agent/status.md` | L3 | Read once at the start of each task; read only the current goal and blockers |
+| `.agent/status.md` | L3 | Read once at the start of each task; read the current goal, plan link, and blockers |
+| `.agent/plans/<task-slug>.md` | L3 | When status links a plan; read that plan when resuming |
+| `.agent/backlog.md` | L3 | When selecting the next task or reporting pending work |
+| `.agent/upgrades.md` | L3 | Dependency upgrade, security advisory, or release |
 | `.agent/decisions.md`, `lessons.md` | L3 | When historical rationale or retrospective is needed |
 | `.agent/environment.md` | L3 | On installation or build failure, or when changing environments |
+| `.agent/agent-health.md` | L3 | Maintenance is due, agent behavior conflicts with assets, or an asset change is planned |
+| `.agent/sandbox.md` | L3 | Before integration or end-to-end verification, or when tests may touch shared or production systems |
 | `.agent/domains/*.md` | L3 | When the domain's concerns are involved |
 | `.agent/knowledge/*.md` | L3 | When matched by the index; 1 to 3 per time |
 | `.agent/memory/` | L3 | When cross-session conclusions are needed |
 
 The full profile, decisions, and lessons must not be copied into the contract.
+
+Maintenance triggers, modes, and mechanism classes are defined in `protocols/en/maintenance.md`; adapters map them to real platform features.
 
 ## Generation Requirements
 

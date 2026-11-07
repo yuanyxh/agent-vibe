@@ -92,9 +92,12 @@ def check_profile():
     return text
 
 
-def check_states():
+def check_states(profile):
     required = [
         ".agent/status.md",
+        ".agent/backlog.md",
+        ".agent/upgrades.md",
+        ".agent/plans/_template.md",
         ".agent/decisions.md",
         ".agent/lessons.md",
         ".agent/environment.md",
@@ -106,6 +109,21 @@ def check_states():
             fail(name, "missing or empty")
     if not os.path.isfile(os.path.join(ROOT, ".agent/memory/INDEX.md")):
         warn(".agent/memory/INDEX.md", "missing; long-term memory cannot be indexed by number")
+    health = os.path.join(ROOT, ".agent/agent-health.md")
+    version = ""
+    if profile:
+        match = re.search(r"(?m)^seed_version:\s*(\S+)\s*$", profile)
+        version = match.group(1) if match else ""
+    older = False
+    if re.fullmatch(r"\d+\.\d+\.\d+", version):
+        older = tuple(int(part) for part in version.split(".")) < (1, 5, 0)
+    if not nonempty(health):
+        if older:
+            warn(".agent/agent-health.md", "missing; upgrade to 1.5.0 adds the health baseline")
+        else:
+            fail(".agent/agent-health.md", "missing or empty")
+    if not os.path.isfile(os.path.join(ROOT, ".agent/.maintenance-state")):
+        warn(".agent/.maintenance-state", "missing; maintenance throttling cannot be verified")
 
 
 def check_profile_domain(profile):
@@ -213,6 +231,25 @@ def find_hook(name):
     return None
 
 
+def check_dependencies(profile):
+    if not profile:
+        return
+    stack = parse_section(profile, "stack")
+    verify = parse_section(profile, "verify")
+    manager = stack.get("package_manager", "")
+    if manager and manager != "none":
+        for key in ("outdated", "audit"):
+            if not verify.get(key):
+                warn(".agent/profile.yaml", f"package manager declared but verify.{key} is missing")
+        lockfile = stack.get("lockfile", "")
+        if not lockfile or lockfile == "none":
+            warn(".agent/profile.yaml", "stack.lockfile is not declared")
+        elif not os.path.isfile(os.path.join(ROOT, lockfile)):
+            fail(lockfile, "declared lock file is missing")
+    if not verify.get("audit"):
+        warn(".agent/profile.yaml", "verify.audit is missing; dependency checks are incomplete")
+
+
 def check_hooks(profile):
     if not profile:
         return
@@ -269,18 +306,43 @@ def check_hooks(profile):
             warn(".github/PULL_REQUEST_TEMPLATE.md", "GitHub project is missing a PR template")
 
 
+def check_maintenance(profile):
+    if not profile:
+        return
+    agent = parse_section(profile, "agent")
+    if agent.get("maintenance_mode", "") != "hook":
+        return
+    candidates = (
+        ".claude/settings.json",
+        ".codex/config.toml",
+        ".cursor/automations.json",
+        ".cursor/settings.json",
+    )
+    found = [name for name in candidates if os.path.isfile(os.path.join(ROOT, name))]
+    if not found:
+        warn(".agent/profile.yaml", "maintenance_mode=hook but no platform hook configuration was found")
+        return
+    for name in found:
+        text = read(os.path.join(ROOT, name))
+        if "hook" in text.lower() or "maintenance" in text.lower():
+            return
+    warn(".agent/profile.yaml", "maintenance_mode=hook but the hook configuration does not mention hooks or maintenance")
+
+
 if not os.path.isdir(ROOT):
     print(f"FAIL target directory does not exist: {ROOT}")
     sys.exit(1)
 
 check_contract()
 profile = check_profile()
-check_states()
+check_states(profile)
 check_profile_domain(profile)
 check_rules()
 check_skills()
 check_metadata()
+check_dependencies(profile)
 check_hooks(profile)
+check_maintenance(profile)
 
 print(f"checked instantiation {ROOT} | {len(fails)} errors | {len(warns)} warnings")
 for line in fails:

@@ -1,10 +1,21 @@
-seed_version: 1.2.0
+seed_version: 1.5.0
 project:
   name: golden
   type: web
   domain: web-app
+stack:
+  language: typescript
+  framework: none
+  package_manager: npm
+  lockfile: package-lock.json
 agent:
   platform: claude-code
+  rules_scope: core+type+concern
+  maintenance_cadence: weekly
+  maintenance_mode: hook
+  maintenance_stale_days: 7
+  isolation_level: auto
+  isolation_egress: deny
 delivery:
   vcs: git
   repo_host: github
@@ -18,3 +29,5 @@ verify:
   test: "true"
   format: npm run format:check
   lint: npm run lint
+  outdated: npm outdated
+  audit: npm audit --audit-level=high

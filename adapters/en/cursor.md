@@ -16,6 +16,7 @@ applies_when: { agent.platform: cursor }
 | `skill/<name>` | `.cursor/commands/<name>.md` |
 | `contract` | `AGENTS.md` |
 | `state/<name>` | `.agent/<name>.md` (`state/profile` is `.agent/profile.yaml`, `state/memory` is `.agent/memory/README.md`) |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | Project root directory |
 
 ## Rule File Header
@@ -44,9 +45,18 @@ Read names and descriptions only, do not copy content, and do not record persona
 | --- | --- |
 | Project | `.cursor/rules/`, `.cursor/commands/`, `.cursor/mcp.json`, `AGENTS.md` |
 | User | User-level rules and commands |
-| Plugins and tools | Installed extensions and MCP services |
+| Plugins and tools | Installed extensions, MCP services, and configured Automations |
 
 On conflict, project rules and the user's current statement prevail; third-party content is not adopted by default.
+
+## Automations and Scheduling
+
+Mechanism classes, throttling, and degradation follow `protocols/en/maintenance.md`.
+
+- Cursor Automations run agents on a schedule or on events such as a Slack message, Linear issue, GitHub pull request, PagerDuty incident, or custom webhook; they run in a cloud sandbox and can use MCP and a memory tool.
+- There is no local lifecycle hook equivalent. Maintenance degrades to `advisory` contract rules plus explicit `steward` command invocation, or to a Cursor Automation when the project allows cloud execution.
+- For isolated verification, prefer a Cursor Automation or a remote container; local process isolation remains the fallback.
+- Do not claim automatic local triggering when only a cloud automation exists.
 
 ## Budget
 

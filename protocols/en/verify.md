@@ -22,11 +22,16 @@ After modifying `seeds/en/`, `protocols/en/`, or `adapters/en/`, run `scripts/ch
 | Knowledge indexable | The project has a knowledge index listing loading topics and trigger conditions, not injected wholesale |
 | No platform residue | Seed files contain no platform paths such as `.claude/`, `.cursor/`, or `CLAUDE.md` |
 | Status traceable | `.agent/status.md` records generated and ungenerated items |
+| Planning traceable | A multi-step task links `.agent/plans/<task-slug>.md`; each step has status and evidence; drift entries have reason and impact |
+| Backlog single queue | `.agent/backlog.md` exists; open items have ID, priority, status, and source; no item is duplicated in status or plan |
 | Project buildable | The build command declared by the profile executes successfully |
 | Engineering gates | Format, lint, and type-check commands execute successfully as declared by the profile |
 | Hooks executable | `pre-commit` and `commit-msg` exist and are executable, with commands consistent with `verify.format` / `verify.lint` |
 | PR template | A PR template exists when `repo_host=github` |
 | Version control ready | VCS is initialized; ignore rules cover generated artifacts, dependencies, local configuration, and verification data |
+| Dependency locked | `stack.lockfile` is declared and exists when dependencies exist; `verify.install` reinstalls from it reproducibly |
+| Dependency audit | `verify.audit` is declared and executed, or `none` with a reason; high-severity items have fix or acceptance records |
+| Upgrade scan traceable | `verify.outdated` is declared; `.agent/upgrades.md` records current and latest versions, change type, recommendation, reason, and scan date |
 | Commit compliance | Committed records comply with commit conventions; if uncommitted, explain the reason and pending authorization actions |
 | External facts traceable | Version numbers, platform support scope, and tool usage have sources and query times |
 | Research traceable | `.agent/research.md` exists; each conclusion has a source, version, and query date; rejected items have reasons |

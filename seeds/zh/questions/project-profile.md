@@ -27,6 +27,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 | `stack.language` | 是 | 按 type 推荐 | 编程语言 |
 | `stack.framework` | 是 | 按 type 推荐 | 主框架，可为 none |
 | `stack.package_manager` | 是 | 按语言推荐 | 包管理器 |
+| `stack.lockfile` | 否 | 按包管理器推导 | 锁定文件路径，或 none |
 | `stack.runtime` | 否 | 按语言推荐 | 运行时版本约束 |
 | `ui.has_ui` | 是 | 按 type 推导 | 是否存在可视化界面 |
 | `ui.design_system` | 否 | none | 组件库或设计系统 |
@@ -52,6 +53,8 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 | `quality.perf_budget` | 否 | 无 | 可度量的性能上限 |
 | `quality.compliance` | 否 | [] | privacy / payment / health / finance |
 | `verify.install` | 是 | 按包管理器推导 | 安装依赖命令 |
+| `verify.outdated` | 否 | 按包管理器推导 | 版本升级检测命令 |
+| `verify.audit` | 否 | 按供应链设置推导 | 依赖漏洞与许可证审计命令 |
 | `verify.build` | 是 | 按技术栈推导 | 构建命令 |
 | `verify.format` | 是 | 按 quality.format 推导 | 格式化检查命令 |
 | `verify.lint` | 是 | 按 quality.lint 推导 | 静态检查命令 |
@@ -76,6 +79,11 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 | `supply_chain.sbom` | 否 | false | 是否需要物料清单 |
 | `agent.platform` | 是 | claude-code | claude-code / cursor / codex / generic |
 | `agent.rules_scope` | 是 | core+type+concern | 规则加载范围 |
+| `agent.maintenance_cadence` | 否 | weekly | daily / weekly / monthly / manual |
+| `agent.maintenance_mode` | 否 | 平台支持时 hook，否则 advisory | advisory / hook / scheduled |
+| `agent.maintenance_stale_days` | 否 | 7 | 体检报告超过多少天视为过期 |
+| `agent.isolation_level` | 否 | auto | auto / container / process / virtual-machine / none |
+| `agent.isolation_egress` | 否 | deny | deny / allowlist / open |
 
 ## 提问顺序
 
@@ -90,7 +98,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 7. **协作**：仅在 `team != solo` 时询问审查方式与变更日志要求。
 8. **环境**：编辑器与工具链偏好、目标平台与版本、硬约束；用户未提及的项不追问，登记为待生长。
 9. **治理与供应链**：公开性、许可证、安全报告方式；生产或公开项目询问依赖更新与扫描要求。
-10. **Agent**：平台与规则范围。
+10. **Agent**：平台、规则范围、维护节奏与模式、隔离级别与外联策略。
 11. **种子版本**：不提问，生成时取种子仓库 `SEEDS_VERSION` 写入 `seed_version`。
 
 ## 推断规则
@@ -102,6 +110,7 @@ init 只维护一份画像。提问、生长、校验都以它为输入。
 - `scale = prototype` 且未指定测试级别时推荐 `basic`。
 - 未指定 `delivery.vcs` 时默认 `git`；`team = solo` 时 `branch_strategy = trunk`，否则 `feature-branch`。仓库已存在时探测其默认分支作为 `trunk_branch`，否则默认 `main`。
 - `quality.format/lint/typecheck` 按语言推荐主流工具，并同步推导 `verify.*` 命令。
+- 按包管理器与供应链设置推导 `stack.lockfile`、`verify.outdated`、`verify.audit`；只有记录原因时才填 `none`，且不得自动执行升级。
 - `project.domain` 由 `type`、行业与用途推导，名称是自由文本；不要求在种子库中已存在同名定义。
 - `target.platforms` 由 `project.type` 推导；版本范围在生成时查证，不在此处硬编码。
 - `governance.openness = public` 时许可证必问；`scale = production` 时依赖更新与漏洞扫描默认启用。

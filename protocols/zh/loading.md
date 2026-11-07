@@ -60,14 +60,21 @@ skills: [build, review]         # load_via=skill 时必填
 | 内容 | 层 | 读取时机 |
 | --- | --- | --- |
 | 画像摘要（名称、形态、技术栈、质量预算） | L0 | 内联到契约 |
-| `.agent/status.md` | L3 | 每次任务开始时读一次，只读当前目标与阻塞 |
+| `.agent/status.md` | L3 | 每次任务开始时读一次，读当前目标、计划链接与阻塞 |
+| `.agent/plans/<task-slug>.md` | L3 | 状态链接了计划时；恢复任务时读该计划 |
+| `.agent/backlog.md` | L3 | 选择下一项任务或汇报待办时 |
+| `.agent/upgrades.md` | L3 | 依赖升级、安全公告或发布时 |
 | `.agent/decisions.md`、`lessons.md` | L3 | 需要历史依据或复盘时 |
 | `.agent/environment.md` | L3 | 安装、构建失败或换环境时 |
+| `.agent/agent-health.md` | L3 | 体检到期、agent 行为与资产冲突或计划变更资产时 |
+| `.agent/sandbox.md` | L3 | 集成或端到端验证前，或测试可能触碰共享/生产系统时 |
 | `.agent/domains/*.md` | L3 | 涉及该领域关注点时 |
 | `.agent/knowledge/*.md` | L3 | 按索引命中，每次 1~3 篇 |
 | `.agent/memory/` | L3 | 需要跨会话结论时 |
 
 完整画像、决策与教训全文不得复制进契约。
+
+维护的触发、模式与机制类别见 `protocols/zh/maintenance.md`；适配器负责映射到平台真实机制。
 
 ## 生成要求
 

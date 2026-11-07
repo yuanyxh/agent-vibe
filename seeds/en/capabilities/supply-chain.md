@@ -22,6 +22,7 @@ verify:
   - Lock files are committed and installations are reproducible
   - High-severity vulnerabilities have handling records
   - New dependencies have source and license records
+  - Upgrade candidates have a scan date, current and latest versions, and a recommendation
 ---
 
 # Supply Chain
@@ -35,6 +36,7 @@ Every piece of code and artifact entering the project can answer: where it came 
 - Lock before updating: the lock file is the single source of truth.
 - Choose an update policy based on the ecosystem and team capabilities; do not preset specific tools as defaults.
 - Scan and audit commands must be executable and included in quality gates or scheduled tasks.
+- Version detection records candidates and recommendations; upgrades are confirmed by the user and never applied automatically.
 - Generate a bill of materials and signatures only when the user explicitly requests them.
 
 ## Verification

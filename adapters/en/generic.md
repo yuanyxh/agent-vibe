@@ -18,6 +18,7 @@ Applies to agents that support the `AGENTS.md` convention.
 | `skill/<name>` | `.agent/skills/<name>/SKILL.md` |
 | `contract` | `AGENTS.md` |
 | `state/<name>` | `.agent/<name>.md` (`state/profile` is `.agent/profile.yaml`, `state/memory` is `.agent/memory/README.md`) |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | Project root directory |
 
 ## Loading Strategy
@@ -42,9 +43,18 @@ Read names and descriptions only, do not copy content, and do not record persona
 | --- | --- |
 | Project | `AGENTS.md`, `.agent/skills/`, `.agent/rules/`, platform MCP configuration |
 | User | User-level skills and rules |
-| Plugins and tools | Skill packs and MCP tools listed by the platform |
+| Plugins and tools | Skill packs, MCP tools, and scheduler or CI configuration |
 
 On conflict, project rules and the user's current statement prevail; third-party content is not adopted by default.
+
+## Scheduling
+
+Mechanism classes, throttling, and degradation follow `protocols/en/maintenance.md`.
+
+- Use an operating-system scheduler or CI job to invoke the agent on the configured cadence.
+- There is no native hook guarantee; state the trigger in the contract and require explicit `steward` invocation.
+- For isolation, use a container, virtual machine, or emulator when available; otherwise use process isolation with temporary resources.
+- Mark every non-native mechanism as `degraded`.
 
 ## Contract Requirements
 
@@ -53,7 +63,7 @@ The top of `AGENTS.md` states the one-sentence project description, form, and te
 1. Index of rule files and loading timing.
 2. Index of skill directories and trigger conditions.
 3. Work loop and verification commands.
-4. Runtime conventions: self-check, facts first, authorization boundaries, output, files, tools, memory, platform neutrality.
+4. Runtime conventions: self-check, facts first, authorization boundaries, output, files, tools, memory, plan ledger, platform neutrality.
 5. Breakpoint rules.
 6. Self-learning file locations.
 

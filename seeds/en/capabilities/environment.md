@@ -60,3 +60,7 @@ When switching to another machine or agent environment, first know "what is avai
 - Writing local paths, versions, or mirror addresses as project defaults.
 - Faking verification results because a tool is missing.
 - Installing global tools or modifying system configuration without confirmation.
+
+## Boundary
+
+This capability probes the development and target toolchain. Periodic inspection of prompts, rules, skills, memory, hooks, MCP, and subagents belongs to `capability/agent-environment`.

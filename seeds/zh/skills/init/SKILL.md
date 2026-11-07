@@ -31,6 +31,8 @@ verify: 画像完备、项目可构建、启动契约存在
 - 目标项目路径独立于种子仓库。
 - `.agent/profile.yaml` 所有必填字段有值，且 `seed_version` 等于当前 `SEEDS_VERSION`；领域、环境、记忆文件存在且非空。
 - `.agent/environment.md` 含可脚本化驱动方式：启动命令、打开目标界面的入口、截图或断言手段、日志路径。缺失即为基座不完备。
+- `.agent/agent-health.md` 含基线、下次检查日期与维护模式；`.agent/.maintenance-state` 存在。
+- 隔离决策已记录：生成隔离时 `.agent/sandbox.md` 存在，否则原因写入 `.agent/status.md`。
 - 规则与技能已按适配器位置实例化，文件非空。
 - 启动契约存在，含常驻约束、加载策略、技能索引与工作循环。
 - `.agent/research.md` 存在且非空；外部事实有来源、版本与查询日期。
@@ -66,6 +68,7 @@ verify: 画像完备、项目可构建、启动契约存在
 - 按 `seeds/zh/questions/domain-questions.md` 覆盖该领域的最低必问项；未覆盖不得进入生成。
 - 按 REQ-01 至 REQ-04 处理回答：示例与目标分开记录，清单之外按问题本身补问，范围确认时列出非目标。
 - 领域定义生成后，把其中的 `questions` 并入提问队列逐条确认。
+- 仅在画像缺失时询问维护节奏与模式、隔离级别与外联策略；默认值见 `seeds/zh/questions/project-profile.md`。
 
 ### 3. 研究与对齐
 
@@ -76,6 +79,7 @@ verify: 画像完备、项目可构建、启动契约存在
 - 与本项目规模、目标平台与性能预算相关的常见缺陷。
 - 与种子默认值或既有代码冲突的做法。
 - 盘点项目级、用户级与插件中的技能、规则、命令、子代理，以及可用 MCP 工具；评估适用性、冲突、来源、许可与维护状态。
+- 查证平台的维护机制（钩子、会话调度、云自动化、操作系统/CI 计划）与隔离原语（容器、进程、虚拟机、模拟器、mock），记录版本与查询日期。
 
 每条结论含来源、版本、查询日期、采纳或拒绝理由。结论并入第 5 步确认摘要；目标目录创建后写入 `.agent/research.md`，未确认前不得生成。
 
@@ -106,11 +110,11 @@ verify: 画像完备、项目可构建、启动契约存在
 先把第 3 步的研究结论写入 `.agent/research.md`，再执行以下步骤。
 
 1. 在目标路径创建目录；目标路径不得是种子仓库。
-2. `.agent/profile.yaml`（含 `seed_version`）、`status.md`、`decisions.md`、`lessons.md`、`memory/README.md` 与 `memory/INDEX.md`。
-3. 执行 `protocols/zh/environment.md` 的环境探测，写入 `.agent/environment.md`；其中必须写明可脚本化驱动方式（启动命令、界面入口、截图或断言手段、日志路径），不可脚本化时说明替代验证方式。
+2. `.agent/profile.yaml`（含 `seed_version`）、`status.md`、`backlog.md`、`upgrades.md`、`decisions.md`、`lessons.md`、`agent-health.md`、`.maintenance-state`、`memory/README.md` 与 `memory/INDEX.md`；`.agent/plans/_template.md` 为计划模板，任务计划按需从模板创建。探测 `stack.lockfile`，推导 `verify.outdated` 与 `verify.audit`；把首次扫描写入 `upgrades.md`，不可用时填 `none` 并记录原因。
+3. 执行 `protocols/zh/environment.md` 的环境探测，写入 `.agent/environment.md`；其中必须写明可脚本化驱动方式（启动命令、界面入口、截图或断言手段、日志路径），不可脚本化时说明替代验证方式。同时探测隔离原语；`capability/isolated-environment` 触发时把方案写入 `.agent/sandbox.md`，不创建环境，否则把原因写入 `status.md`。
 4. 项目骨架：优先使用 `packs/zh/` 中匹配的技术包；没有匹配包时按 `seeds/scaffolds/README.md` 的结构要求现场生成，并在报告中标注“未使用技术包”。
 5. 版本控制：探测默认分支并记录为 `delivery.trunk_branch`；按画像初始化仓库，生成忽略规则，覆盖构建产物、依赖、本地配置与验证数据；首次提交需用户授权。
-6. 工程化配置：生成格式化、静态检查、类型检查与本地钩子配置，命令与 `verify.*` 一致。从 `seeds/scaffolds/hooks/` 生成 `pre-commit` 与 `commit-msg`，替换占位符并设为可执行，用 `core.hooksPath` 安装；`repo_host=github` 时生成 `.github/PULL_REQUEST_TEMPLATE.md`。钩子至少覆盖 `verify.format` 与 `verify.lint`。
+6. 工程化配置：生成格式化、静态检查、类型检查与本地钩子配置，命令与 `verify.*` 一致。从 `seeds/scaffolds/hooks/` 生成 `pre-commit` 与 `commit-msg`，替换占位符并设为可执行，用 `core.hooksPath` 安装；`repo_host=github` 时生成 `.github/PULL_REQUEST_TEMPLATE.md`。钩子至少覆盖 `verify.format` 与 `verify.lint`。`agent.maintenance_mode=hook` 时从 `seeds/scaffolds/hooks/agent-maintenance` 生成维护钩子并注册到适配器位置；平台不支持钩子时降级为 `advisory` 并在契约标记。
 7. 能力生长：逐项检查 `seeds/zh/capabilities/`，按 `triggers` 与画像决定生成、跳过或待生长；研究类能力已在第 3 步完成，登记为已生成，不重复执行。上下文未确定的维度不生成，登记原因。知识包按 `seeds/zh/knowledge/INDEX.md` 选取相关主题，写入项目索引。
 8. 领域生长：为每个 `project.domain` 解析定义——`seeds/zh/domains/` 有匹配则复用，否则按 `seeds/zh/domains/_schema.md` 现场生成并写入项目 `.agent/domains/`；逐条覆盖 `core_concerns`，未覆盖项登记原因。复用定义时保留正文，剥离种子元数据。
 9. 规则：按 `applies_when` 筛选，排除非 active 与过期条目；按 `protocols/zh/loading.md` 分层：`always` 合并内联进契约（≤ 60 行），`path` 生成带路径范围的规则文件，`skill` 写入 `.agent/rules/` 且由技能正文引用，`read` 在契约标记降级。剥离种子元数据，只保留正文。
@@ -122,7 +126,8 @@ verify: 画像完备、项目可构建、启动契约存在
 
 执行 `protocols/zh/verify.md` 与 `protocols/zh/bootstrap.md` 的校验：
 
-- 画像、领域、环境、记忆、研究、规则、技能、契约全部存在且非空。
+- 画像、领域、环境、agent 体检、记忆、研究、规则、技能、契约全部存在且非空。
+- 维护模式有真实机制支撑，或已显式标记降级；隔离决策已记录。
 - 研究结论有来源、版本与查询日期，采纳项能映射到生成物。
 - Agent 资产盘点结论存在，未复制来源不明内容。
 - 工程化命令可执行。

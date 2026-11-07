@@ -31,6 +31,8 @@ Turn a one-sentence idea into a developable project, and let any later agent ent
 - The target project path is separate from the seed repository.
 - All required fields in `.agent/profile.yaml` have values, and `seed_version` equals the current `SEEDS_VERSION`; the domain, environment, and memory files exist and are non-empty.
 - `.agent/environment.md` contains a scriptable driving method: startup command, entry point to open the target UI, screenshot or assertion means, and log paths. Missing these means the base is incomplete.
+- `.agent/agent-health.md` contains a baseline, next check date, and maintenance mode; `.agent/.maintenance-state` exists.
+- The isolation decision is recorded: `.agent/sandbox.md` when isolation is generated, otherwise the reason in `.agent/status.md`.
 - Rules and skills have been instantiated at adapter locations, and the files are non-empty.
 - The startup contract exists and contains resident constraints, loading strategy, skill index, and work loop.
 - `.agent/research.md` exists and is non-empty; external facts have sources, versions, and query dates.
@@ -66,6 +68,7 @@ Ask in rounds per `seeds/en/questions/project-profile.md`. Rules:
 - Cover the minimum required questions for the domain per `seeds/en/questions/domain-questions.md`; do not proceed to generation until covered.
 - Handle answers per REQ-01 to REQ-04: record examples separately from goals, ask follow-up questions based on the questions themselves beyond the checklist, and list non-goals when confirming scope.
 - After generating the domain definition, merge its `questions` into the questioning queue and confirm them one by one.
+- Ask maintenance cadence and mode, isolation level, and egress policy only when the profile lacks them; use the defaults in `seeds/en/questions/project-profile.md`.
 
 ### 3. Research and alignment
 
@@ -76,6 +79,7 @@ After the technology stack, form factor, and domain are determined, verify curre
 - Common defects related to the project's scale, target platforms, and performance budget.
 - Practices that conflict with seed defaults or existing code.
 - Inventory skills, rules, commands, and sub-agents at the project level, user level, and in plugins, plus available MCP tools; assess applicability, conflicts, sources, licenses, and maintenance status.
+- Verify the platform's maintenance mechanisms (hook, session scheduler, cloud automation, OS/CI schedule) and isolation primitives (container, process, virtual machine, emulator, mock), with version and query date.
 
 Each conclusion includes source, version, query date, and adoption or rejection reason. Conclusions are merged into the confirmation summary in step 5; after the target directory is created, write them to `.agent/research.md`; do not generate before confirmation.
 
@@ -106,11 +110,11 @@ Execute per `protocols/en/bootstrap.md` and `protocols/en/grow.md`. init stops a
 First write the research conclusions from step 3 into `.agent/research.md`, then perform the following steps.
 
 1. Create the directory at the target path; the target path must not be the seed repository.
-2. `.agent/profile.yaml` (including `seed_version`), `status.md`, `decisions.md`, `lessons.md`, `memory/README.md`, and `memory/INDEX.md`.
-3. Run the environment probe from `protocols/en/environment.md` and write `.agent/environment.md`; it must state the scriptable driving method (startup command, UI entry point, screenshot or assertion means, log paths), and explain the alternative verification method when scripting is impossible.
+2. `.agent/profile.yaml` (including `seed_version`), `status.md`, `backlog.md`, `upgrades.md`, `decisions.md`, `lessons.md`, `agent-health.md`, `.maintenance-state`, `memory/README.md`, and `memory/INDEX.md`; `.agent/plans/_template.md` is the plan template and task plans are created from it on demand. Probe `stack.lockfile` and derive `verify.outdated` and `verify.audit`; write the initial scan into `upgrades.md`, or record `none` with a reason.
+3. Run the environment probe from `protocols/en/environment.md` and write `.agent/environment.md`; it must state the scriptable driving method (startup command, UI entry point, screenshot or assertion means, log paths), and explain the alternative verification method when scripting is impossible. Also probe isolation primitives; when `capability/isolated-environment` triggers, write the plan to `.agent/sandbox.md` without creating the environment, otherwise record the reason in `status.md`.
 4. Project skeleton: prefer a matching technology pack in `packs/en/`; when none matches, generate on the spot per the structural requirements in `seeds/scaffolds/README.md`, and mark "no technology pack used" in the report.
 5. Version control: detect the default branch and record it as `delivery.trunk_branch`; initialize the repository per the profile, generate ignore rules covering build artifacts, dependencies, local configuration, and verification data; the first commit requires user authorization.
-6. Engineering configuration: generate formatting, static analysis, type checking, and local hook configuration, with commands consistent with `verify.*`. Generate `pre-commit` and `commit-msg` from `seeds/scaffolds/hooks/`, replace placeholders, make them executable, and install them via `core.hooksPath`; when `repo_host=github`, generate `.github/PULL_REQUEST_TEMPLATE.md`. Hooks must cover at least `verify.format` and `verify.lint`.
+6. Engineering configuration: generate formatting, static analysis, type checking, and local hook configuration, with commands consistent with `verify.*`. Generate `pre-commit` and `commit-msg` from `seeds/scaffolds/hooks/`, replace placeholders, make them executable, and install them via `core.hooksPath`; when `repo_host=github`, generate `.github/PULL_REQUEST_TEMPLATE.md`. Hooks must cover at least `verify.format` and `verify.lint`. When `agent.maintenance_mode=hook`, generate the maintenance hook from `seeds/scaffolds/hooks/agent-maintenance` at the adapter hook location and register it; when the platform cannot hook, degrade to `advisory` and mark it in the contract.
 7. Capability growth: check each item in `seeds/en/capabilities/` and decide per `triggers` and the profile whether to generate, skip, or wait; research capabilities are already completed in step 3, register them as generated, and do not repeat. Do not generate dimensions whose context is undetermined; register the reason. Select related knowledge packs per `seeds/en/knowledge/INDEX.md` and write them into the project index.
 8. Domain growth: resolve a definition for each `project.domain` — reuse if `seeds/en/domains/` has a match, otherwise generate on the spot per `seeds/en/domains/_schema.md` and write it into the project's `.agent/domains/`; cover `core_concerns` one by one, and register reasons for uncovered items. When reusing a definition, keep the body and strip the seed metadata.
 9. Rules: filter by `applies_when`, excluding non-active and expired entries; layer per `protocols/en/loading.md`: merge `always` inline into the contract (≤ 60 lines), generate rule files with path scopes for `path`, write `skill` into `.agent/rules/` and reference it from skill bodies, and mark `read` as degraded in the contract. Strip seed metadata and keep only the body.
@@ -122,7 +126,8 @@ First write the research conclusions from step 3 into `.agent/research.md`, then
 
 Run the checks in `protocols/en/verify.md` and `protocols/en/bootstrap.md`:
 
-- Profile, domains, environment, memory, research, rules, skills, and contract all exist and are non-empty.
+- Profile, domains, environment, agent health, memory, research, rules, skills, and contract all exist and are non-empty.
+- Maintenance mode is backed by a real mechanism or explicitly marked degraded; the isolation decision is recorded.
 - Research conclusions have sources, versions, and query dates, and adopted items map to generated artifacts.
 - The agent asset inventory conclusion exists, and no content of unknown origin was copied.
 - Engineering commands are executable.

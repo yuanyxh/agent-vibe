@@ -2,7 +2,7 @@
 
 [![Seed checks](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml/badge.svg?branch=main)](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Seed version](https://img.shields.io/badge/seeds-1.1.0-informational)](SEEDS_VERSION)
+[![Seed version](https://img.shields.io/badge/seeds-1.4.0-informational)](SEEDS_VERSION)
 
 English | [中文](README.zh.md)
 
@@ -29,7 +29,7 @@ agent-vibe flips the order: profile first, seeds second, project last. The proje
 | `seeds/en/capabilities/` | Capability definitions: what must be guaranteed, when to trigger, what to ask, what to research, and how to verify. Concrete outputs are generated after the context is known. |
 | `seeds/en/domains/` | Domain definition schema and high-frequency reference domains. Domains are an open set: reuse a reference when it matches, otherwise generate one from context. |
 | `seeds/en/knowledge/` | General architecture knowledge packs: authentication, authorization, caching, queues, files, notifications, consistency, time zones, import/export, PDF, updates, configuration, testing, components, deployment, observability, and system definition. Load by topic, never wholesale. |
-| `protocols/en/` | Protocols for growth, distillation, verification, evolution, upgrades, loading, research, environment discovery, and memory. Rules carry a lifecycle and a loading mechanism. |
+| `protocols/en/` | Protocols for growth, distillation, verification, evolution, upgrades, loading, research, environment discovery, memory, and planning. Rules carry a lifecycle and a loading mechanism. |
 | `adapters/en/` | Platform mappings: where seeds land for Claude Code, Cursor, Codex, or a generic `AGENTS.md`. |
 | `packs/` | Optional technology packs. The core repository ships none; add your own when a project needs a fixed stack. |
 | `examples/en/` | Complete walkthroughs and domain examples. Not read by `init`. |
@@ -85,13 +85,21 @@ The example below uses Claude Code. Other platforms are described under `adapter
 ├── CLAUDE.md                           # startup contract: always-on baseline + loading index
 ├── .claude/
 │   ├── skills/                         # skill bodies, triggered on demand
+│   ├── hooks/                          # maintenance reminder scripts
+│   ├── settings.json                   # hook registration and permissions
 │   └── rules/                          # path-scoped rules only
 └── .agent/
     ├── profile.yaml                    # project profile, including seed_version
     ├── research.md                     # best-practice research brief
+    ├── agent-health.md                 # agent environment health report
+    ├── sandbox.md                      # isolation plan and evidence
+    ├── .maintenance-state              # maintenance throttle state
     ├── rules/                          # task rules read by skills
     ├── memory/                         # INDEX.md plus topic files
+    ├── plans/                          # _template.md plus per-task plans
     ├── status.md                       # single source of truth
+    ├── backlog.md                      # queue for unplanned and deferred work
+    ├── upgrades.md                     # dependency scan and upgrade recommendations
     ├── decisions.md                    # decision log
     └── lessons.md                      # self-learning record
 ```
@@ -105,7 +113,9 @@ Only `CLAUDE.md` is always loaded. Everything else enters context by path, by sk
 | Day-to-day development | `build` |
 | Defect investigation | `hunt` |
 | Change review | `review` |
-| Experience distillation | `learn` |
+| Experience distillation and code health | `learn` |
+| Agent environment health | `steward` |
+| Isolated integration and E2E verification | `sandbox` |
 | Parallel subtasks | `delegate` |
 | Dependency and framework upgrades | `upgrade` |
 | Release | `ship` |

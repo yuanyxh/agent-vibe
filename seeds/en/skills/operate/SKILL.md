@@ -25,7 +25,7 @@ Before executing, read `.agent/rules/observability.md` and `deploy.md`; skip and
 
 1. **Gather data**: read monitoring, logs, alerts, user feedback, and resource costs; state the time range and source.
 2. **Judge**: distinguish normal fluctuation, needs observation, and needs handling.
-3. **Attribute**: move issues needing handling to `hunt`; route requirement-like feedback into the backlog.
+3. **Attribute**: move issues needing handling to `hunt`; route requirement-like feedback into `.agent/backlog.md` with an ID, priority, status, and source.
 4. **Report**: give a health conclusion, anomaly list, cost changes, and recommended actions.
 5. **Record**: write the conclusion into `.agent/status.md`.
 

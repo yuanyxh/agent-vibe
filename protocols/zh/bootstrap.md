@@ -15,7 +15,8 @@ init 只负责把种子实例化为可开发的工程基座，不负责实现业
 | 产物 | 判据 |
 | --- | --- |
 | `.agent/profile.yaml` | 必填字段完整，含 `seed_version` |
-| `.agent/status.md`、`decisions.md`、`lessons.md` | 有初始内容 |
+| `.agent/status.md`、`decisions.md`、`lessons.md`、`backlog.md`、`upgrades.md` | 有初始内容 |
+| `.agent/plans/_template.md` | 计划模板存在；任务计划按需从模板创建 |
 | `.agent/memory/README.md`、`INDEX.md` | 存在，索引可检索 |
 | `.agent/environment.md` | 有探测记录 |
 | `.agent/research.md` | 有版本基线、实践清单、agent 资产盘点、来源与采纳/拒绝理由 |
@@ -32,7 +33,7 @@ init 只负责把种子实例化为可开发的工程基座，不负责实现业
 ## 顺序
 
 1. 创建目标目录。
-2. 写入状态、画像（含 `seed_version`）与记忆索引骨架。
+2. 写入状态、待办、依赖升级、画像（含 `seed_version`）与记忆索引骨架。
 3. 执行环境探测。
 4. 按 `protocols/zh/research.md` 写入最佳实践与 agent 资产盘点结论。
 5. 生成项目骨架与工程化配置。

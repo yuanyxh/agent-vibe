@@ -23,20 +23,25 @@ Before executing, read `.agent/rules/engineering.md` and `testing.md`; skip and 
 
 ## Steps
 
-1. **Inventory**: list the current and latest versions and security advisories for direct dependencies, runtimes, and toolchains.
-2. **Tiering**: four categories — patch, minor, major, breaking; security fixes first.
-3. **Plan**: upgrade only one category at a time; state the impact scope, required code changes, and rollback method.
-4. **Execute**: update lock files, run the build and tests.
-5. **Verify**: compare test, build, and critical-path results before and after the upgrade.
-6. **Record**: record the upgrade reason, versions, and rollback point in `.agent/decisions.md`.
+1. **Detect**: run `verify.outdated` and `verify.audit`; when a command is `none`, state the degradation. Record current and latest versions, change type, advisories, and scan date for direct dependencies, runtimes, and toolchains in `.agent/upgrades.md`.
+2. **Recommend**: for each candidate recommend now, next, or hold with a reason. Security fixes come first; major versions require a risk note. Wait for user confirmation before upgrading.
+3. **Tier**: patch, minor, major, breaking; upgrade only one category at a time.
+4. **Plan**: write the batch, impact scope, required code changes, verification commands, and rollback method to `.agent/plans/<task-slug>.md` per CTX-04.
+5. **Execute**: update lock files and run the build and tests.
+6. **Verify**: compare test, build, and critical-path results before and after the upgrade; a failed batch is rolled back before the next one starts.
+7. **Record**: update the decision row in `.agent/upgrades.md` and record the upgrade reason, versions, and rollback point in `.agent/decisions.md`; move deferred items to `.agent/backlog.md`.
 
 ## Completion criteria
 
+- `.agent/upgrades.md` has a scan date, command, and a recommendation for every candidate.
 - Every batch of upgrades has comparable verification results before and after.
 - Breaking changes are handled or explicitly recorded as unhandled.
+- Deferred or rejected candidates have a reason and a backlog entry.
 
 ## Prohibited
 
 - Upgrading all dependencies at once.
 - Continuing to stack upgrades while tests fail.
 - Skipping security advisories and ignoring high-severity items.
+- Reporting remembered versions as current without running the detection command.
+- Auto-upgrading major versions without user confirmation.

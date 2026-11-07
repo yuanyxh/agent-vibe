@@ -2,7 +2,7 @@
 
 [![种子校验](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml/badge.svg?branch=main)](https://github.com/yuanyxh/agent-vibe/actions/workflows/seed-check.yml)
 [![许可证: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![种子版本](https://img.shields.io/badge/seeds-1.1.0-informational)](SEEDS_VERSION)
+[![种子版本](https://img.shields.io/badge/seeds-1.4.0-informational)](SEEDS_VERSION)
 
 [English](README.md) | 中文
 
@@ -29,7 +29,7 @@ agent-vibe 把顺序倒过来：先画像，再种子，最后才是项目。项
 | `seeds/zh/capabilities/` | 能力定义：要保证什么、何时触发、要问什么、要查什么、如何验证。具体产物在上下文确定后生成。 |
 | `seeds/zh/domains/` | 领域定义规范与高频参考领域。领域是开放集合：命中参考定义则复用，未命中时按上下文生成。 |
 | `seeds/zh/knowledge/` | 通用架构知识包：鉴权、权限、缓存、队列、文件、通知、一致性、时区、导入导出、PDF、更新、配置、测试、组件、部署、可观测性、系统定义。按主题加载，不整册注入。 |
-| `protocols/zh/` | 生长、提炼、校验、演进、升级、加载、研究、环境探测与记忆协议。规则带生命周期与加载方式。 |
+| `protocols/zh/` | 生长、提炼、校验、演进、升级、加载、研究、环境探测、记忆与计划协议。规则带生命周期与加载方式。 |
 | `adapters/zh/` | 平台映射：把种子写到 Claude Code、Cursor、Codex 或通用 `AGENTS.md` 的约定位置。 |
 | `packs/` | 可选技术包。核心仓库不内置；需要固定某技术栈时自行添加。 |
 | `examples/zh/` | 完整示例与领域示例，不被 `init` 读取。 |
@@ -85,13 +85,21 @@ agent-vibe/
 ├── CLAUDE.md                   # 启动契约：常驻底线 + 加载索引
 ├── .claude/
 │   ├── skills/                 # 技能正文，按需触发
+│   ├── hooks/                  # 维护提醒脚本
+│   ├── settings.json           # 钩子注册与权限
 │   └── rules/                  # 仅带 paths 的路径规则
 └── .agent/
     ├── profile.yaml            # 项目画像，含 seed_version
     ├── research.md             # 最佳实践研究简报
+    ├── agent-health.md         # agent 环境体检报告
+    ├── sandbox.md              # 隔离方案与证据
+    ├── .maintenance-state      # 维护节流状态
     ├── rules/                  # 任务型规则，由技能读取
     ├── memory/                 # INDEX.md 索引 + 主题文件
+    ├── plans/                  # _template.md 与按需创建的单任务计划
     ├── status.md               # 单一事实源
+    ├── backlog.md              # 未排期与延后工作的队列
+    ├── upgrades.md             # 依赖扫描与升级推荐
     ├── decisions.md            # 决策日志
     └── lessons.md              # 自学习沉淀
 ```
@@ -105,7 +113,9 @@ agent-vibe/
 | 日常开发 | `build` |
 | 缺陷排查 | `hunt` |
 | 变更审查 | `review` |
-| 经验沉淀 | `learn` |
+| 经验沉淀与代码健康 | `learn` |
+| agent 环境体检 | `steward` |
+| 隔离的集成与 E2E 验证 | `sandbox` |
 | 并行子任务 | `delegate` |
 | 依赖与框架升级 | `upgrade` |
 | 发布 | `ship` |

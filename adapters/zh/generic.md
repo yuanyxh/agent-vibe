@@ -18,6 +18,7 @@ applies_when: { agent.platform: generic }
 | `skill/<name>` | `.agent/skills/<name>/SKILL.md` |
 | `contract` | `AGENTS.zh.md` |
 | `state/<name>` | `.agent/<name>.md`（`state/profile` 为 `.agent/profile.yaml`，`state/memory` 为 `.agent/memory/README.md`） |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | 项目根目录 |
 
 ## 加载策略
@@ -42,9 +43,18 @@ applies_when: { agent.platform: generic }
 | --- | --- |
 | 项目 | `AGENTS.zh.md`、`.agent/skills/`、`.agent/rules/`、平台 MCP 配置 |
 | 用户 | 用户级技能与规则 |
-| 插件与工具 | 平台列出的技能包与 MCP 工具 |
+| 插件与工具 | 平台列出的技能包、MCP 工具与调度/CI 配置 |
 
 冲突时以项目规则和用户当前说明为准；第三方内容默认不采纳。
+
+## 调度
+
+机制类别、节流与降级遵循 `protocols/zh/maintenance.md`。
+
+- 使用操作系统调度器或 CI 任务按配置节奏调用 agent。
+- 没有原生钩子保证；在契约中写明触发条件，并要求显式调用 `steward`。
+- 隔离时优先使用容器、虚拟机或模拟器；都不可用时使用进程级隔离与临时资源。
+- 所有非原生机制标记为 `degraded`。
 
 ## 契约要求
 
@@ -53,7 +63,7 @@ applies_when: { agent.platform: generic }
 1. 规则文件索引与加载时机。
 2. 技能目录索引与触发条件。
 3. 工作循环与验证命令。
-4. 运行时约定：自检、事实优先、授权边界、输出、文件、工具、记忆、平台中立。
+4. 运行时约定：自检、事实优先、授权边界、输出、文件、工具、记忆、计划台账、平台中立。
 5. 断点规则。
 6. 自学习文件位置。
 

@@ -16,6 +16,7 @@ applies_when: { agent.platform: claude-code }
 | `rule/read` | `.agent/rules/<name>.md`，契约索引标记降级 |
 | `contract` | `CLAUDE.md` |
 | `state/<name>` | `.agent/<name>.md`（`state/profile` 为 `.agent/profile.yaml`，`state/memory` 为 `.agent/memory/README.md`） |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | 项目根目录 |
 | 权限与钩子 | `.claude/settings.json` |
 
@@ -51,10 +52,22 @@ description: 何时触发，包含用户可能的说法
 2. 加载策略：内容、层级、触发条件、实际机制。
 3. 技能索引：名称与触发条件。
 4. 工作循环与验证命令。
-5. 运行时约定：自检、事实优先、授权边界、输出、文件、工具、记忆、平台中立。
+5. 运行时约定：自检、事实优先、授权边界、输出、文件、工具、记忆、计划台账、平台中立。
 6. 自学习位置与断点规则。
 
 契约只写索引与摘要，不复制规则、画像、状态、决策或技能正文。核心内联块用 `<!-- core:start -->` 与 `<!-- core:end -->` 包裹，块内 ≤ 60 行。
+
+## 钩子与调度
+
+机制类别、节流与降级遵循 `protocols/zh/maintenance.md`。
+
+- 钩子写在 `.claude/settings.json`；钩子脚本放在 `.claude/hooks/`。
+- 可用于维护的生命周期事件：`SessionStart`、`SessionEnd`、`UserPromptSubmit`、`Stop`、`StopFailure`、`PreToolUse`、`PostToolUse`。
+- 默认使用 `SessionStart`：运行维护钩子，在 `.agent/agent-health.md` 缺失或过期时注入一行简短提醒。
+- `Stop` 可用 `decision: block` 与理由阻塞结束，但必须由用户显式开启；每个会话最多阻塞一次，同一待办不重复阻塞。
+- 钩子输出会进入上下文；只保留一行，禁止包含密钥。
+- 会话内定时使用 `CronCreate`；持久任务写入 `.claude/scheduled_tasks.json`，仅在 REPL 空闲时触发，循环任务 7 天后过期。长期节奏使用操作系统调度或 CI。
+- 技能由模型按 `description` 触发；会话技能清单有预算，可能截断描述。描述要短且以触发条件为主；适用时用 `paths` 做确定性激活，用 `/name` 显式调用。
 
 ## 资产盘点
 
@@ -62,7 +75,7 @@ description: 何时触发，包含用户可能的说法
 
 | 范围 | 位置 |
 | --- | --- |
-| 项目 | `.claude/skills/`、`.claude/rules/`、`.claude/agents/`、`.claude/commands/`、`.claude/settings.json`、`CLAUDE.md` |
+| 项目 | `.claude/skills/`、`.claude/rules/`、`.claude/agents/`、`.claude/commands/`、`.claude/hooks/`、`.claude/settings.json`、`.claude/scheduled_tasks.json`、`CLAUDE.md` |
 | 用户 | `~/.claude/skills/`、`~/.claude/agents/`、`~/.claude/CLAUDE.md` |
 | 插件与工具 | 已安装插件、MCP 服务列表 |
 

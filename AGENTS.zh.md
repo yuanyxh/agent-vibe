@@ -8,10 +8,11 @@
 - `CAPABILITIES.zh.md`：能力导航；只写有什么、何时用、得到什么，不复制协议细节。
 - `seeds/zh/`：与 `seeds/zh/` 对应的中文镜像。结构与语义必须与英文侧保持一致。
 - `seeds/zh/`：权威抽象内容。不得出现具体项目名、路径、账号、密钥、技术版本号；生成与校验以英文侧为准。
-- `seeds/zh/capabilities/`：能力定义，只写触发、问题、研究项、产物类别与验证标准；不写具体产品配置。记忆能力只写协议、分层与降级，不写入任何记忆内容。
+- `seeds/zh/capabilities/`：能力定义，只写触发、问题、研究项、产物类别与验证标准；不写具体产品配置。记忆能力只写协议、分层与降级，不写入任何记忆内容。计划能力只写文件边界、生命周期与偏移处理，不写入任何项目的计划内容。agent 环境与隔离验证能力只定义周期性体检与可丢弃的端到端环境，不写入任何项目的报告。
+- `seeds/zh/skills/`：情境动作，如 `init`、`build`、`hunt`、`review`、`learn`、`steward`、`sandbox`；只写步骤、产物与禁止项，不写平台路径。
 - `seeds/zh/domains/`：领域定义规范（`_schema.md`）与高频参考定义。领域是开放集合；未命中参考定义时现场生成，`examples/zh/domains/` 仅为写法参考。
 - `seeds/zh/knowledge/`：通用架构知识包与索引。只写问题、模式、取舍、验证与反例，不写具体项目实现；按主题加载。
-- `protocols/zh/`：生长、提炼、校验、演进、升级、加载、研究、环境探测与记忆协议。改动协议需同步更新 `adapters/`。
+- `protocols/zh/`：生长、提炼、校验、演进、升级、加载、研究、环境探测、记忆、计划与维护协议。改动协议需同步更新 `adapters/`。
 - `adapters/zh/`：平台落点映射，覆盖 Claude Code、Cursor、Codex 与通用平台，只描述位置与格式转换，不承载业务内容。
 - `SEEDS_VERSION`、`CHANGELOG.md`：种子仓库对外版本与变更记录；生成项目的 `seed_version` 与升级依据。
 - `tests/`：实例化校验的 golden fixture；`.github/`：推送与合并请求的种子校验。

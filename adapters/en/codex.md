@@ -16,6 +16,7 @@ applies_when: { agent.platform: codex }
 | `rule/read` | `.agent/rules/<name>.md`, contract index marks `degraded` |
 | `contract` | `AGENTS.md` |
 | `state/<name>` | `.agent/<name>.md` (`state/profile` is `.agent/profile.yaml`, `state/memory` is `.agent/memory/README.md`) |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | Project root directory |
 
 ## Skill Format
@@ -46,6 +47,15 @@ Skills are explicitly invoked via `$<name>` and can also be triggered by descrip
 - Content without a native mechanism must state the read action explicitly and must not be described as "automatically loaded".
 - `AGENTS.md` ≤ 200 lines, core inline ≤ 60 lines, a single on-demand rule ≤ 120 lines; wrap the core block with `<!-- core:start -->` and `<!-- core:end -->`.
 
+## Hooks and Scheduling
+
+Mechanism classes, throttling, and degradation follow `protocols/en/maintenance.md`.
+
+- Codex Automations can run on a schedule or external event; use them for periodic maintenance when the project allows cloud execution.
+- Codex CLI hooks are version-dependent. Verify that the current version supports the event and configuration before generating anything; when it cannot be confirmed, do not generate hook configuration.
+- Without hooks, degrade to `AGENTS.md` rules, explicit `$steward` invocation, and an operating-system or CI schedule.
+- Skills are invoked via `$<name>` or selected from the description; keep descriptions short and trigger-focused.
+
 ## Asset Inventory
 
 Read names and descriptions only, do not copy content, and do not record personal paths.
@@ -54,7 +64,7 @@ Read names and descriptions only, do not copy content, and do not record persona
 | --- | --- |
 | Project | `AGENTS.md`, `.agents/skills/`, `.agent/rules/`, project-level MCP configuration |
 | User | `~/.agents/skills/`, `~/.codex/config.toml` |
-| Plugins and tools | Skill packs and MCP services listed by the platform |
+| Plugins and tools | Skill packs, MCP services, and configured Automations |
 
 On conflict, project rules and the user's current statement prevail; third-party content is not adopted by default.
 

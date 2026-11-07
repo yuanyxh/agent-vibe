@@ -16,6 +16,7 @@ applies_when: { agent.platform: claude-code }
 | `rule/read` | `.agent/rules/<name>.md`, contract index marks degraded |
 | `contract` | `CLAUDE.md` |
 | `state/<name>` | `.agent/<name>.md` (`state/profile` is `.agent/profile.yaml`, `state/memory` is `.agent/memory/README.md`) |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | Project root directory |
 | Permissions and hooks | `.claude/settings.json` |
 
@@ -51,10 +52,22 @@ Seed header fields `id`, `kind`, `version`, `updated`, `review_by`, `status`, `l
 2. Loading strategy: content, layer, trigger conditions, actual mechanism.
 3. Skill index: names and trigger conditions.
 4. Work loop and verification commands.
-5. Runtime conventions: self-check, facts first, authorization boundaries, output, files, tools, memory, platform neutrality.
+5. Runtime conventions: self-check, facts first, authorization boundaries, output, files, tools, memory, plan ledger, platform neutrality.
 6. Self-learning locations and breakpoint rules.
 
 The contract writes only the index and summaries, not copying rule bodies, profiles, status, decisions, or skill bodies. Wrap the core inline block with `<!-- core:start -->` and `<!-- core:end -->`, with ≤ 60 lines inside.
+
+## Hooks and Scheduling
+
+Mechanism classes, throttling, and degradation follow `protocols/en/maintenance.md`.
+
+- Hooks live in `.claude/settings.json`; hook scripts live under `.claude/hooks/`.
+- Lifecycle events usable for maintenance: `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `Stop`, `StopFailure`, `PreToolUse`, `PostToolUse`.
+- Use `SessionStart` by default: run the maintenance hook and inject one short reminder when `.agent/agent-health.md` is missing or stale.
+- `Stop` may block termination with `decision: block` and a reason, but only when the user opts in; block at most once per session and never for the same pending item.
+- Hook output becomes context; keep it to one line and never include secrets.
+- Session-bound scheduling uses `CronCreate`; durable jobs persist in `.claude/scheduled_tasks.json`, fire only while the REPL is idle, and recurring jobs expire after 7 days. For long-term cadence, use an operating-system scheduler or CI.
+- Skill triggering is model-invoked through `description`; the session skill listing has a budget and may truncate descriptions. Keep descriptions short and trigger-focused, use `paths` for deterministic activation when applicable, and use `/name` for explicit invocation.
 
 ## Asset Inventory
 
@@ -62,7 +75,7 @@ Read names and descriptions only, do not copy content, and do not record persona
 
 | Scope | Location |
 | --- | --- |
-| Project | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/commands/`, `.claude/settings.json`, `CLAUDE.md` |
+| Project | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/commands/`, `.claude/hooks/`, `.claude/settings.json`, `.claude/scheduled_tasks.json`, `CLAUDE.md` |
 | User | `~/.claude/skills/`, `~/.claude/agents/`, `~/.claude/CLAUDE.md` |
 | Plugins and tools | Installed plugins, MCP service list |
 

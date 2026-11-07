@@ -34,6 +34,8 @@ status: active
 | 异常与轨迹 | `observability.md` | 崩溃、错误上报、用户轨迹 | 线上问题难以定位 |
 | 系统定义与标准化 | `system-definition.md` | 项目启动、术语、边界 | 新项目或多人协作 |
 | 缺陷类型与调试手段 | `debugging-playbook.md` | 卡顿、内存、卡死、慢查询、UI 显示与交互 | 选择调试工具或定位根因 |
+| 代码健康 | `code-health.md` | 架构、反模式与死代码检测 | 架构审查、重构、缺陷反复 |
+| agent 维护 | `agent-maintenance.md` | agent 环境腐化、记忆/规则/技能漂移 | 定期体检、资产陈旧、重复修正 |
 
 ## 加载规则
 

@@ -35,6 +35,28 @@ SCAN_DIRS = ("seeds", "protocols", "adapters", "examples")
 SKIP_NAMES = {"README.md", "INDEX.md", "_schema.md"}
 PATH_SCOPES = {"source", "ui", "server", "tests", "config", "domain"}
 ADAPTER_FILES = ("claude-code.md", "cursor.md", "codex.md", "generic.md")
+REQUIRED_ASSETS = (
+    "protocols/en/maintenance.md",
+    "protocols/zh/maintenance.md",
+    "seeds/en/capabilities/agent-environment.md",
+    "seeds/zh/capabilities/agent-environment.md",
+    "seeds/en/capabilities/isolated-environment.md",
+    "seeds/zh/capabilities/isolated-environment.md",
+    "seeds/en/skills/steward/SKILL.md",
+    "seeds/zh/skills/steward/SKILL.md",
+    "seeds/en/skills/sandbox/SKILL.md",
+    "seeds/zh/skills/sandbox/SKILL.md",
+    "seeds/en/knowledge/code-health.md",
+    "seeds/zh/knowledge/code-health.md",
+    "seeds/en/knowledge/agent-maintenance.md",
+    "seeds/zh/knowledge/agent-maintenance.md",
+)
+ADAPTER_SECTIONS = {
+    "claude-code.md": ("Hooks and Scheduling", "钩子与调度"),
+    "cursor.md": ("Automations and Scheduling", "自动化与调度"),
+    "codex.md": ("Hooks and Scheduling", "钩子与调度"),
+    "generic.md": ("Scheduling", "调度"),
+}
 PLATFORM_LABELS = {
     "en": ("Claude Code", "Cursor", "Codex", "Generic"),
     "zh": ("Claude Code", "Cursor", "Codex", "通用"),
@@ -256,6 +278,32 @@ for path in glob.glob("seeds/en/skills/*/SKILL.md"):
     skill = os.path.basename(os.path.dirname(path))
     if skill not in docs:
         fail(path, f"skill {skill} is not registered in README or CAPABILITIES")
+
+for path in REQUIRED_ASSETS:
+    if not os.path.isfile(path) or os.path.getsize(path) == 0:
+        fail(path, "required maintenance or isolation asset is missing or empty")
+
+for lang in ("en", "zh"):
+    for adapter, labels in ADAPTER_SECTIONS.items():
+        path = f"adapters/{lang}/{adapter}"
+        if not os.path.isfile(path):
+            continue
+        text = open(path, encoding="utf-8").read()
+        if not any(label in text for label in labels):
+            fail(path, "adapter is missing a scheduling or automation section")
+        if "maintenance.md" not in text:
+            fail(path, "adapter does not reference the maintenance protocol")
+
+for lang, terms in (
+    ("en", ("architecture", "anti-pattern", "dead code")),
+    ("zh", ("架构", "反模式", "死代码")),
+):
+    path = f"seeds/{lang}/skills/learn/SKILL.md"
+    if os.path.isfile(path):
+        text = open(path, encoding="utf-8").read().lower()
+        for term in terms:
+            if term.lower() not in text:
+                fail(path, f"learn is missing code health term: {term}")
 
 if not os.path.exists("SEEDS_VERSION"):
     fail("SEEDS_VERSION", "missing")

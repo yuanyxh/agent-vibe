@@ -40,6 +40,7 @@ Every generated project must have:
 | --- | --- | --- |
 | `hooks/pre-commit` | `.githooks/pre-commit` | Replace `{{verify.format}}`, `{{verify.lint}}`, `{{verify.typecheck}}`; use `none` when undeclared; executable |
 | `hooks/commit-msg` | `.githooks/commit-msg` | Validate `type(scope): summary` per VCS-02; executable |
+| `hooks/agent-maintenance` | Adapter-defined hook location | Emit one reminder when the health report is missing or stale; no network; executable |
 | `github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` | Generated when `repo_host=github` |
 
 Install with `git config core.hooksPath .githooks`. Hooks and CI must run the same commands; a failure blocks the commit.

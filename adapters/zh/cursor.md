@@ -16,6 +16,7 @@ applies_when: { agent.platform: cursor }
 | `skill/<name>` | `.cursor/commands/<name>.md` |
 | `contract` | `AGENTS.zh.md` |
 | `state/<name>` | `.agent/<name>.md`（`state/profile` 为 `.agent/profile.yaml`，`state/memory` 为 `.agent/memory/README.md`） |
+| `state/plans` | `.agent/plans/<task-slug>.md` |
 | `project/root` | 项目根目录 |
 
 ## 规则文件头部
@@ -44,9 +45,18 @@ Cursor 没有与 Skill 等价的原生机制。技能正文写入 `.cursor/comma
 | --- | --- |
 | 项目 | `.cursor/rules/`、`.cursor/commands/`、`.cursor/mcp.json`、`AGENTS.zh.md` |
 | 用户 | 用户级规则与命令 |
-| 插件与工具 | 已安装扩展与 MCP 服务 |
+| 插件与工具 | 已安装扩展、MCP 服务与已配置的 Automations |
 
 冲突时以项目规则和用户当前说明为准；第三方内容默认不采纳。
+
+## 自动化与调度
+
+机制类别、节流与降级遵循 `protocols/zh/maintenance.md`。
+
+- Cursor Automations 按计划或事件运行 agent，事件包括 Slack 消息、Linear issue、GitHub PR、PagerDuty 事件或自定义 Webhook；运行在云端沙箱，可使用 MCP 与记忆工具。
+- 本地没有等价的生命周期钩子。维护降级为 `advisory` 契约规则加显式 `steward` 命令调用，或在项目允许云端执行时使用 Cursor Automation。
+- 隔离验证优先使用 Cursor Automation 或远程容器；本地进程隔离作为兜底。
+- 只有云端自动化时，不得声称本地自动触发。
 
 ## 预算
 

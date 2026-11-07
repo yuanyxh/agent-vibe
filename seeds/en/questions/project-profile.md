@@ -27,6 +27,7 @@ init maintains only one profile. Questioning, growth, and verification all use i
 | `stack.language` | Yes | Recommended by type | Programming language |
 | `stack.framework` | Yes | Recommended by type | Main framework; can be none |
 | `stack.package_manager` | Yes | Recommended by language | Package manager |
+| `stack.lockfile` | No | Derived from package manager | Lock file path, or none |
 | `stack.runtime` | No | Recommended by language | Runtime version constraints |
 | `ui.has_ui` | Yes | Derived from type | Whether a visual interface exists |
 | `ui.design_system` | No | none | Component library or design system |
@@ -52,6 +53,8 @@ init maintains only one profile. Questioning, growth, and verification all use i
 | `quality.perf_budget` | No | None | Measurable performance limits |
 | `quality.compliance` | No | [] | privacy / payment / health / finance |
 | `verify.install` | Yes | Derived from package manager | Dependency installation command |
+| `verify.outdated` | No | Derived from package manager | Version upgrade detection command |
+| `verify.audit` | No | Derived from supply chain settings | Dependency vulnerability and license audit command |
 | `verify.build` | Yes | Derived from technology stack | Build command |
 | `verify.format` | Yes | Derived from quality.format | Format check command |
 | `verify.lint` | Yes | Derived from quality.lint | Static check command |
@@ -76,6 +79,11 @@ init maintains only one profile. Questioning, growth, and verification all use i
 | `supply_chain.sbom` | No | false | Whether a bill of materials is needed |
 | `agent.platform` | Yes | claude-code | claude-code / cursor / codex / generic |
 | `agent.rules_scope` | Yes | core+type+concern | Rule loading scope |
+| `agent.maintenance_cadence` | No | weekly | daily / weekly / monthly / manual |
+| `agent.maintenance_mode` | No | hook when supported, otherwise advisory | advisory / hook / scheduled |
+| `agent.maintenance_stale_days` | No | 7 | Days before the health report is considered stale |
+| `agent.isolation_level` | No | auto | auto / container / process / virtual-machine / none |
+| `agent.isolation_egress` | No | deny | deny / allowlist / open |
 
 ## Question order
 
@@ -90,7 +98,7 @@ Each round asks at most four questions, only about missing fields whose prerequi
 7. **Collaboration**: Ask about review method and changelog requirements only when `team != solo`.
 8. **Environment**: Editor and toolchain preferences, target platforms and versions, hard constraints. Do not press for items the user did not mention; register them as pending growth.
 9. **Governance and supply chain**: Openness, license, security reporting method. For production or public projects, ask about dependency update and scanning requirements.
-10. **Agent**: Platform and rule scope.
+10. **Agent**: Platform, rule scope, maintenance cadence and mode, isolation level and egress policy.
 11. **Seed version**: Do not ask; during generation, take `SEEDS_VERSION` from the seed repository and write it to `seed_version`.
 
 ## Inference rules
@@ -102,6 +110,7 @@ Fields that can be inferred from existing answers or repository facts are not as
 - When `scale = prototype` and the test level is unspecified, recommend `basic`.
 - Default `delivery.vcs` to `git` when unspecified; when `team = solo`, `branch_strategy = trunk`; otherwise `feature-branch`. When a repository exists, detect its default branch as `trunk_branch`; otherwise default to `main`.
 - Recommend mainstream tools for `quality.format/lint/typecheck` by language and derive the `verify.*` commands accordingly.
+- Derive `stack.lockfile`, `verify.outdated`, and `verify.audit` from the package manager and supply-chain settings; use `none` only with a recorded reason, and never run upgrades automatically.
 - Derive `project.domain` from `type`, industry, and purpose; the name is free text and does not require a same-named definition to exist in the seed repository.
 - Derive `target.platforms` from `project.type`; verify version ranges during generation, and do not hardcode them here.
 - When `governance.openness = public`, the license must be asked. When `scale = production`, dependency updates and vulnerability scanning are enabled by default.

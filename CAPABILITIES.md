@@ -25,6 +25,7 @@ Rules and capabilities are constraints. Skills are actions. Knowledge is referen
 | Agent asset inventory | "Is there an existing skill or rule?" or "will this conflict?" | Inventory project, user, and plugin assets; assess provenance, licenses, and conflicts | Inventory conclusions in the research brief |
 | Knowledge packs | "How is authorization usually done?" | Read the matching topic and give patterns, tradeoffs, and verification | A proposal, never a wholesale dump |
 | Memory | "What was that decision last time?" | Read status, decisions, lessons, and long-term memory | Restored context without relying on conversation history |
+| Planning | "Remember this for later" or "the plan drifted" | Write the current plan, agreements, and backlog to files; reconcile each step and record drift | `.agent/plans/<task-slug>.md`, `.agent/backlog.md` |
 
 ## 2. Day-to-day development
 
@@ -33,9 +34,11 @@ Rules and capabilities are constraints. Skills are actions. Knowledge is referen
 | `build` | "Implement this" or "continue" | Read status, implement in small steps, self-test, and suggest a commit | Code, status updates, commit suggestions |
 | `hunt` | "It errors", "it does not work", "it regressed" | Reproduce, narrow the scope, find the root cause, fix, and add a regression check | Fix, root cause, `.agent/lessons.md` |
 | `review` | "Look at the diff" or "check before merging" | Review the diff, check the rules, and give a verdict | Findings ordered by severity |
-| `learn` | "Record this" or "retrospective" | Distill evidence-backed lessons and propose promotion | Project lessons or seed candidates |
-| `upgrade` | "Dependencies are old" or "there is a vulnerability" | Inventory, classify, batch upgrades, and verify | Upgrade record and rollback points |
+| `learn` | "Record this", "retrospective", "architecture review", "dead code" | Distill evidence-backed lessons, scan architecture/anti-patterns/dead code, and propose promotion | Project lessons, findings, or seed candidates |
+| `upgrade` | "Dependencies are old" or "there is a vulnerability" | Detect versions, recommend batches, upgrade, verify, and record | `.agent/upgrades.md`, upgrade record, and rollback points |
 | `delegate` | "Run this in parallel" or "hand it to a subagent" | Pass only the goal, boundaries, acceptance criteria, and resource locations | Subtask results that do not contaminate your judgment |
+| `steward` | "Agent check", "clean up rules or memory", "agent rot", "prompt/MCP/hook check" | Inventory the agent environment, detect rot, and propose keep/merge/deprecate/add actions | `.agent/agent-health.md` |
+| `sandbox` | "Tests affect production", "need an isolated environment", "end-to-end verification" | Probe the target runtime, choose an isolation level, and create a disposable E2E environment | `.agent/sandbox.md`, configuration, and scripts |
 | Tool recommendation | "Is there a better way?" | Give candidates, reasons, costs, and alternatives | Recommendation and decision record |
 
 ## 3. Delivery and operations
@@ -55,6 +58,8 @@ Rules and capabilities are constraints. Skills are actions. Knowledge is referen
 | --- | --- | --- | --- |
 | Development environment | "I use VS Code or IDEA" | Check the current practice for that environment before generating configuration | Editor configuration or an equivalent description |
 | Target environment | "Support Chrome 120+ or Safari 17" | Verify compatibility practices and build targets | Compatibility declaration and checks |
+| Agent environment | "Check the agent environment" or "the agent keeps ignoring rules" | Inspect prompts, rules, skills, memory, hooks, MCP, subagents, and the environment; detect rot and propose consolidation | `.agent/agent-health.md` |
+| Isolated verification environment | "Tests must not touch production" | Choose container, process, or virtual machine; create a disposable E2E environment and verify teardown | `.agent/sandbox.md`, configuration, and scripts |
 | Governance | "We are open-sourcing this" or "several people will collaborate" | Generate a license, contribution guide, and security policy | Community health files |
 | Supply chain | "This is a production project" or "we need vulnerability scanning" | Locking, update policy, audit, and SBOM | Configuration and reports |
 | Documentation | "We need a handoff" or "newcomers cannot follow this" | Usage, architecture, decisions, and troubleshooting | Documentation people can act on |

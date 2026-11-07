@@ -15,7 +15,8 @@ The following must actually exist and be non-empty in the target project:
 | Artifact | Criterion |
 | --- | --- |
 | `.agent/profile.yaml` | All required fields complete, including `seed_version` |
-| `.agent/status.md`, `decisions.md`, `lessons.md` | Have initial content |
+| `.agent/status.md`, `decisions.md`, `lessons.md`, `backlog.md`, `upgrades.md` | Have initial content |
+| `.agent/plans/_template.md` | Plan template exists; task plans are created from it on demand |
 | `.agent/memory/README.md`, `INDEX.md` | Exist and the index is searchable |
 | `.agent/environment.md` | Contains probe records |
 | `.agent/research.md` | Contains version baseline, practice checklist, agent asset inventory, sources, and accept/reject reasons |
@@ -32,7 +33,7 @@ The following must actually exist and be non-empty in the target project:
 ## Order
 
 1. Create the target directory.
-2. Write the status, profile (including `seed_version`), and memory index skeleton.
+2. Write the status, backlog, upgrades, profile (including `seed_version`), and memory index skeleton.
 3. Perform environment probing.
 4. Write best practices and agent asset inventory conclusions per `protocols/en/research.md`.
 5. Generate the project skeleton and engineering configuration.

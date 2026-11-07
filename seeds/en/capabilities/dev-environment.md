@@ -42,3 +42,7 @@ Anyone following the repository instructions gets a development environment cons
 ## Verification
 
 On a machine that has never been configured, installation, startup, and tests can be completed using only the repository documentation.
+
+## Boundary
+
+This capability makes the developer environment reproducible. Disposable, production-safe integration and end-to-end environments belong to `capability/isolated-environment`.

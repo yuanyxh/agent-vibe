@@ -44,3 +44,7 @@ Make "what is supported and what is not" a verifiable fact rather than a verbal 
 ## Verification
 
 Produce artifacts with the declared build configuration and run smoke checks in the lowest supported environment.
+
+## Boundary
+
+This capability declares and verifies the supported runtime range. Creating a disposable environment that cannot reach production belongs to `capability/isolated-environment`.
